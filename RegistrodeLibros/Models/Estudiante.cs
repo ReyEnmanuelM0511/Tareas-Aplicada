@@ -9,7 +9,7 @@ public class Estudiante
     public string Nombres { get; set; } = null!;
 
     [Required(ErrorMessage = "Este campo es obligatorio")]
-    public string? Direcion { get; set; } = null!;
+    public string? Direccion { get; set; } = null!;
 
     [Required(ErrorMessage = "Este campo es obligatorio")]
     public string? Email{ get; set; } = null!;
