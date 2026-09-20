@@ -1,0 +1,224 @@
+﻿@page "/EstudianteIndex"
+
+@using BlazorBootstrap
+@using RegistrodeLibros.Extensors
+@using RegistrodeLibros.Models
+@using RegistrodeLibros.Services
+
+@inject EstudiantesServices estudianteS
+@inject ToastService toastServices
+@rendermode InteractiveServer
+
+<PageTitle>Base de Datos Estudiantil</PageTitle>
+<ConfirmDialog @ref="dialog"/>
+
+
+<div class="p-3 border rounded">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h3 class="mb-0">
+            Listado de Estudiantes
+        </h3>
+
+        <a href="/crearEstudiante" class="btn btn-primary">
+            Agregar Estudiante
+        </a>
+
+    </div>
+
+        
+    <div class="row align-items-end mb-4">
+
+        <div class="col-md-3">
+
+            <label class="form-label">
+                Filtrar por
+            </label>
+
+            <select class="form-select" @bind="filtroPor">
+
+                <option value="">
+                    Selecciona una opción
+                </option>
+
+                <option value="EstudianteId">
+                    EstudianteId
+                </option>
+
+                <option value="Nombre">
+                    Nombre
+                </option>
+
+                <option value="Direccion">
+                    Dirección
+                </option>
+
+                <option value="Email">
+                    Email
+                </option>
+
+                <option value="FechaNacimiento">
+                    Fecha de Nacimiento
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label class="form-label">
+                Buscar
+            </label>
+
+            <div class="input-group">
+
+                <input class="form-control" @bind="filtro" placeholder="Buscar" />
+
+                <button type="button"class="btn btn-outline-primary bi bi -search"@onclick="Buscar"> Buscar</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    
+    <div class="table-responsive">
+
+        <table class="table table-striped table-hover align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>EstudianteId</th>
+
+                    <th>Nombre</th>
+
+                    <th>Direccion</th>
+
+                    <th>Email</th>
+
+                    <th>Fecha de Nacimiento</th>
+
+                    <th>Acciones</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @foreach(var estudiante in estudiante){
+                    <tr>
+                        <td>@estudiante.EstudianteId</td>
+                        <td>@estudiante.Nombres</td>
+                        <td>@estudiante.Direccion</td>
+                        <td>@estudiante.Email</td>
+                        <td>@estudiante.FechaNacimiento</td>
+                        <td>
+                            <a href="@($"/modificarEstudiante/{estudiante.EstudianteId}")" class="btn btn-primary bi bi-pencil-square" ></a>
+                            <button class="btn btn-danger bi bi-trash" @onclick="() => Eliminar(estudiante)"></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p style="margin-top: 10px;">Cantidad: @estudiante.Count</p>
+
+</div>
+
+
+@code {
+
+    private ConfirmDialog dialog = default!;
+    private List<Estudiante> estudiante = new();
+
+    private string filtro { get; set; } = string.Empty;
+    private string filtroPor { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        estudiante = await estudianteS.GetList(l => true);
+    }
+
+    private async Task Eliminar(Estudiante estudiantes)
+    {
+
+        var opciones = new ConfirmDialogOptions
+        {
+            YesButtonText = "Eliminar",
+            YesButtonColor = ButtonColor.Danger,
+            NoButtonText = "Cancelar",
+            NoButtonColor = ButtonColor.Secondary,
+            IsVerticallyCentered = true
+        };
+
+        bool confirmar = await dialog.ShowAsync(
+            title: "Eliminar estudiante",
+            message1: $"¿Está seguro de que desea eliminar \"{estudiantes.Nombres}\"?",
+            confirmDialogOptions: opciones);
+
+        if (!confirmar)
+            return;
+
+
+        bool resultado = await estudianteS.Eliminar(estudiantes.EstudianteId);
+
+        if (resultado)
+        {
+            estudiante = await estudianteS.GetList(l => true);
+            toastServices.ShowSuccess("Estudiante eliminado correctamente.");
+        }
+        else
+        {
+            toastServices.ShowError("Error al eliminar el estudiante.");
+        }
+    }
+
+    private async Task Buscar()
+    {
+        if (filtro == "")
+        {
+            estudiante = await estudianteS.GetList(l => true);
+        }
+        else if (filtro.Trim() != "" && filtroPor == "Nombres")
+        {
+            estudiante = await estudianteS.GetList(l =>
+                l.Nombres.ToLower().Contains(filtro.ToLower()));
+        }
+        else if (filtro.Trim() != "" && filtroPor == "Direcccion")
+        {
+            estudiante = await estudianteS.GetList(l =>
+                l.Direccion.ToLower().Contains(filtro.ToLower()));
+        }
+        else if (filtroPor == "EstudianteId")
+        {
+            if (int.TryParse(filtro, out int id))
+            {
+                estudiante = await estudianteS.GetList(l => l.EstudianteId == id);
+            }
+        }
+        else if (filtroPor == "FechaNacimiento")
+        {
+            if (DateOnly.TryParse(filtro, out DateOnly anio))
+            {
+                estudiante = await estudianteS.GetList(l => l.FechaNacimiento == anio);
+            }
+        }
+         else if (filtro.Trim() != "" && filtroPor == "Email")
+        {
+            estudiante = await estudianteS.GetList(l =>
+                l.Email.ToLower().Contains(filtro.ToLower()));
+        }
+
+    }
+
+
+}

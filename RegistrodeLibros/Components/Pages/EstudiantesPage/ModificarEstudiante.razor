@@ -1,0 +1,209 @@
+﻿@page "/modificarEstudiante/{id}"
+
+@using RegistrodeLibros.Models
+@using RegistrodeLibros.Services
+
+@inject EstudiantesServices estudianteService
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<PageTitle>Modificar Estudiante</PageTitle>
+
+
+<div class="p-4 border rounded">
+
+    <h3 class="mb-4">
+        Modificar Estudiante
+    </h3>
+
+
+    @if (estudiante == null)
+    {
+        <div class="alert alert-warning">
+            Estudiante no encontrado.
+        </div>
+
+        <a href="/EstudiantesIndex"
+           class="btn btn-secondary">
+
+            Volver
+
+        </a>
+    }
+    else
+    {
+        <div class="mb-3">
+
+            <label class="form-label">
+                EstudianteID
+            </label>
+
+            <input type="number"
+                   class="form-control"
+                   value="@estudiante.EstudianteId"
+                   disabled />
+
+        </div>
+
+
+        
+        <div class="mb-3">
+
+            <label class="form-label">
+                Nombre
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   @bind="estudiante.Nombres"
+                   placeholder="Ingrese el nombre" />
+
+        </div>
+
+
+        
+        <div class="mb-3">
+
+            <label class="form-label">
+                Dirección
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   @bind="estudiante.Direccion"
+                   placeholder="Ingrese la dirección" />
+
+        </div>
+
+
+     
+        <div class="mb-3">
+
+            <label class="form-label">
+                Email
+            </label>
+
+            <input type="email"
+                   class="form-control"
+                   @bind="estudiante.Email"
+                   placeholder="Ingrese el email" />
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Fecha de Nacimiento
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   @bind="estudiante.FechaNacimiento"
+                   placeholder="Ejemplo: 10-20-2000" />
+
+        </div>
+
+
+       
+        <div class="d-flex justify-content-center gap-3 mt-4">
+
+            <a href="/EstudiantesIndex"
+               class="btn btn-secondary">
+
+                Volver
+
+            </a>
+
+
+            <button type="button"
+                    class="btn btn-primary"
+                    @onclick="GuardarCambios">
+
+                Guardar Cambios
+
+            </button>
+
+        </div>
+
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert @claseMensaje mt-4">
+                @mensaje
+            </div>
+        }
+
+    }
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+    private Estudiante? estudiante;
+
+    private string mensaje = string.Empty;
+
+    private string claseMensaje = "alert-success";
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        estudiante = await estudianteService.Buscar(Id);
+    }
+
+
+    private async Task GuardarCambios()
+    {
+        if (estudiante == null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(estudiante.Nombres))
+        {
+            mensaje = "Debe ingresar el nombre del estudiante.";
+            claseMensaje = "alert-danger";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(estudiante.Direccion))
+        {
+            mensaje = "Debe ingresar la dirección del estudiante.";
+            claseMensaje = "alert-danger";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(estudiante.Email))
+        {
+            mensaje = "Debe ingresar el email del estudiante.";
+            claseMensaje = "alert-danger";
+            return;
+        }
+
+        if (estudiante.FechaNacimiento == null)
+        {
+            mensaje = "Debe ingresar la fecha de nacimiento del estudiante.";
+            claseMensaje = "alert-danger";
+            return;
+        }
+
+        bool resultado = await estudianteService.Modificar(estudiante);
+
+        if (resultado)
+        {
+            Navigation.NavigateTo("/EstudiantesIndex");
+        }
+        else
+        {
+            mensaje = "No se pudieron guardar los cambios.";
+            claseMensaje = "alert-danger";
+        }
+
+    }
+}

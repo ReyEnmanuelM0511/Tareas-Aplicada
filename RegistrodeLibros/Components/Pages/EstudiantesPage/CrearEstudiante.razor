@@ -1,0 +1,72 @@
+﻿@page "/crearEstudiante"
+@using RegistrodeLibros.Models
+@using RegistrodeLibros.Services
+@inject EstudiantesServices estudianteServices
+@rendermode InteractiveServer
+
+<PageTitle>Agregar Estudiante</PageTitle>
+
+<div class="p-4 border rounded">
+    <h3>Agregar Estudiante</h3>
+
+    <div class="mb-3 mt-3">
+        <label>EstudianteId</label>
+        <input type="number"
+               class="form-control"
+               @bind="estudiante.EstudianteId" />
+    </div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input type="text"
+               class="form-control"
+               @bind="estudiante.Nombres" />
+    </div>
+
+    <div class="mb-3">
+        <label>Direccion</label>
+        <input type="text"
+               class="form-control"
+               @bind="estudiante.Direccion" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="text"
+               class="form-control"
+               @bind="estudiante.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Nacimiento</label>
+        <input type="text"
+               class="form-control"
+               @bind="estudiante.FechaNacimiento" />
+    </div>
+
+    <div class="d-flex justify-content-center gap-4">
+        <a href="/EstudianteIndex"
+           class="btn btn-secondary mt-5">
+            Volver
+        </a>
+
+        <button class="btn btn-primary mt-5"
+                @onclick="Guardar">
+            Guardar
+        </button>
+    </div>
+</div>
+
+@code {
+    private Estudiante estudiante = new Estudiante();
+
+    private async Task Guardar()
+    {
+        bool resultado = await estudianteServices.Guardar(estudiante);
+
+        if (resultado)
+        {
+            estudiante = new Estudiante();
+        }
+    }
+}
