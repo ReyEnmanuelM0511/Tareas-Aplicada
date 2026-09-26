@@ -1,7 +1,8 @@
-using RegistrodeLibros.Components;
 using Context;
 using Microsoft.EntityFrameworkCore;
-using Services;
+using RegistrodeLibros.Components;
+using RegistrodeLibros.Extensors;
+using RegistrodeLibros.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +12,15 @@ builder.Services.AddRazorComponents()
 
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
 
-builder.Services.AddDbContext<Contexto>(o => o.UseSqlite(ConStr));
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 
 builder.Services.AddScoped<LibrosServices>();
+builder.Services.AddScoped<EstudiantesServices>();
+
+
+builder.Services.AddBlazorBootstrap();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
