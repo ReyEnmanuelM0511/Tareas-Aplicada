@@ -1,0 +1,128 @@
+﻿@page "/modificarPrestamo"
+
+
+@rendermode InteractiveServer
+
+<PageTitle>Modificar Estudiante</PageTitle>
+<EditForm Model="estudiante" OnValidSubmit="Modificar">
+	<DataAnnotationsValidator />
+	<div class="container">
+		<div class="card shadow-lg">
+			<div calss="2card-header text-center">
+				<h3 class="card-title">Modificar Estudiante</h3>
+			</div>
+
+			<div class="card-body">
+				@*EstudainteId*@
+				<div class="mb-3">
+					<label class="form-label"><strong>EstudainteId</strong></label>
+					<InputNumber class="form-control" @bind-Value="estudiante.EstudianteId" readonly></InputNumber>
+				</div>
+
+				@*Nombres*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Nombres</strong></label>
+					<InputText class="form-control" @bind-Value="estudiante.Nombres"></InputText>
+				</div>
+
+				@*Direccion*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Direccion</strong></label>
+					<InputText class="form-control" @bind-Value="estudiante.Direccion"></InputText>
+				</div>
+
+				@*Email*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Email</strong></label>
+					<InputText class="form-control" @bind-Value="estudiante.Email"></InputText>
+				</div>
+
+				@*Fecha de Nacimiento*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Fecha de Nacimiento</strong></label>
+					<InputDate class="form-control" @bind-Value="estudiante.FechaNacimiento"></InputDate>
+				</div>
+
+				@*footer*@
+				<div class="card-footer text-center mt-2">
+					<a href="/EstudianteIndex" class="btn btn-secondary mt-2"><span class="bi bi-arrow-left"></span> Volver</a>
+					<button type="submit" class="btn btn-primary bi bi-floppy mt-2">Guardar</button>
+					<button type="button" class="btn btn-danger bi bi-trash mt-2" @onclick="Eliminar">Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</EditForm>
+
+<Modal @ref="modal" Title="Confirmar Eliminacion">
+	<BodyTemplate>
+		¿Estas seguro que deseas eliminar al estudiante "@estudiante.Nombres"?
+	</BodyTemplate>
+
+	<FooterTemplate>
+		<Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick"> No </Button>
+		<Button Color="ButtonColor.Danger" @onclick="MostrarModal"> Sí </Button>
+	</FooterTemplate>
+</Modal>
+
+@code {
+	[Parameter]
+
+	public int EstudianteId { get; set; }
+
+	private Estudiante estudiante { get; set; } = new Estudiante();
+
+	private Modal modal;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var estudianteEncontrado = await estudianteS.Buscar(EstudianteId);
+
+		if (estudianteEncontrado != null)
+		{
+			estudiante = estudianteEncontrado;
+		}
+	}
+
+	private async Task Modificar()
+	{
+		bool Modificado = await estudianteS.Guardar(estudiante);
+
+		if (Modificado)
+		{
+			toastServices.ShowSuccess("Estudiante modificado correctamente.");
+			navigationManager.NavigateTo("/EstudianteIndex");
+		}
+		else
+		{
+			toastServices.ShowError("Error al modificar al estudiante");
+		}
+	}
+
+	private async Task MostrarModal()
+	{
+		await modal.ShowAsync();
+	}
+
+	private async Task OnHideModalClick()
+	{
+		await modal.HideAsync();
+	}
+
+	private async Task Eliminar()
+	{
+		bool Eliminado = await estudianteS.Eliminar(estudiante.EstudianteId);
+
+		if (Eliminado)
+		{
+			toastServices.ShowSuccess("Estudiante eliminado correctamente.");
+			await modal.HideAsync();
+			navigationManager.NavigateTo("/EstudianteIndex");
+		}
+		else
+		{
+			toastServices.ShowError("Error al eliminar el estudiante");
+		}
+	}
+}
+

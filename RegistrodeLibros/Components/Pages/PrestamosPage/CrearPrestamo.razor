@@ -1,0 +1,91 @@
+﻿@page "/crearPrestamo"
+
+@rendermode InteractiveServer
+
+<PageTitle>Registrar Prestamo</PageTitle>
+
+<EditForm Model="prestamo" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator />
+
+	<div class="container">
+		<div class="card shadow-lg">
+			<div class="card-header text-center">
+				<h5 class="card-title mt-2">Registrar Pr&eacute;stamo</h5>
+			</div>
+
+			<div class="card-body">
+				@*Prestamo*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Id</strong></label>
+					<InputNumber class="form-control" @bind-Value="prestamo.PrestamosId"></InputNumber>
+				</div>
+
+				@*EstudianteId*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Estudiante</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="prestamo.EstudianteId" readonly>
+						<opcion> Elija una opci&oacute;n </opcion>
+						@foreach(var estudiante in estudiantes)
+						{
+							<opcion value="@estudiante.EstudianteId">@estudiante.Nombres</opcion>
+						}
+					</InputSelect>
+					<ValidationMessage For="() => prestamo.EstudianteId"></ValidationMessage>
+				</div>
+
+				@*Libro*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Libro</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="prestamo.LibrosId" readonly>
+						<opcion> Elija una opci&oacute;n </opcion>
+						@foreach (var libro in libros)
+						{
+							<opcion value="@libro.LibroID">@libro.Titulo</opcion>
+						}
+					</InputSelect>
+					<ValidationMessage For="() => prestamo.LibrosId"></ValidationMessage>
+				</div>
+
+			</div>
+
+			@*footer*@
+			<div class="card-footer text-center mt-2">
+				<a href="/prestamoIndex" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
+				<button type="submit" class="btn btn-primary bi bi-floppy">Guardar</button>
+			</div>
+
+		</div>
+	</div>
+
+</EditForm>
+@Mensaje
+
+@code {
+	public PrestamoLibros prestamo = new PrestamoLibros();
+	public string Mensaje { get; set; } = string.Empty;
+	public List<Estudiante> estudiantes { get; set; } = new List<Estudiante>();
+	public List<Libros> libros { get; set; } = new List<Libros>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		estudiantes = await estudianteS.GetList(e => e.EstudianteId > 0);
+		libros = await libroService.GetList(l => l.LibroID > 0 && l.Disponible == true);
+	}
+
+	private async Task Guardar()
+	{
+		 var creado = await prestamoS.Guardar(prestamo);
+
+		if (creado)
+		{
+			toastServices.ShowSuccess("Prestamo registrado correctamente");
+			navigationManager.NavigateTo("/prestamoIndex");
+		}
+		else
+		{
+			toastServices.ShowError("Error al agregar al estudiante");
+		}
+	}
+}
+
+

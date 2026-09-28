@@ -10,4 +10,6 @@ public class Libros
     public string? Autor { get; set; } = null!;
     [Required(ErrorMessage ="El campo de AnoPublicacion es obligatorio")]
     public int AnoPublicacion {get; set;}
+
+    public bool Disponible { get; set; }
 }
