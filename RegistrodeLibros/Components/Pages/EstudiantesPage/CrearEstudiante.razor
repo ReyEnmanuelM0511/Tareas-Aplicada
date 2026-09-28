@@ -1,72 +1,87 @@
 ﻿@page "/crearEstudiante"
-@using RegistrodeLibros.Models
-@using RegistrodeLibros.Services
-@inject EstudiantesServices estudianteServices
 @rendermode InteractiveServer
 
 <PageTitle>Agregar Estudiante</PageTitle>
 
-<div class="p-4 border rounded">
-    <h3>Agregar Estudiante</h3>
+<EditForm Model="estudiante" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator/>
 
-    <div class="mb-3 mt-3">
-        <label>EstudianteId</label>
-        <input type="number"
-               class="form-control"
-               @bind="estudiante.EstudianteId" />
-    </div>
+	<div class="container">
+		<div class="card shadow-lg">
+			<div class="card-header text-center">
+				<h5 class="card-title mt-2">Agregar Estudiante</h5>
+			</div>
 
-    <div class="mb-3">
-        <label>Nombre</label>
-        <input type="text"
-               class="form-control"
-               @bind="estudiante.Nombres" />
-    </div>
+			<div class="card-body">
+				@*EstudianteId*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Id</strong></label>
+					<InputNumber class="form-control" @bind-Value="estudiante.EstudianteId"></InputNumber>
+				</div>
 
-    <div class="mb-3">
-        <label>Direccion</label>
-        <input type="text"
-               class="form-control"
-               @bind="estudiante.Direccion" />
-    </div>
+				@*Nombres*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Nombre Completo</strong></label>
+					<InputText class="form-control" @bind-Value="estudiante.Nombres"></InputText>
+					<ValidationMessage For="() => estudiante.Nombres"></ValidationMessage>
+				</div>
 
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="text"
-               class="form-control"
-               @bind="estudiante.Email" />
-    </div>
+				@*Direccion*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Dirección</strong></label>
+					<InputText class="form-control" @bind-Value="estudiante.Direccion"></InputText>
+					<ValidationMessage For="() => estudiante.Direccion"></ValidationMessage>
+				</div>
 
-    <div class="mb-3">
-        <label>Fecha de Nacimiento</label>
-        <input type="text"
-               class="form-control"
-               @bind="estudiante.FechaNacimiento" />
-    </div>
+				@*Email*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Email</strong></label>
+					<InputText class="form-control" @bind-Value="estudiante.Email"></InputText>
+					<ValidationMessage For="() => estudiante.Email"></ValidationMessage>
+				</div>
 
-    <div class="d-flex justify-content-center gap-4">
-        <a href="/EstudianteIndex"
-           class="btn btn-secondary mt-5">
-            Volver
-        </a>
+				@*Fecha de Nacimiento*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Fecha de Nacimiento</strong></label>
+					<InputDate class="form-control" @bind-Value="estudiante.FechaNacimiento"></InputDate>
+					<ValidationMessage For="() => estudiante.FechaNacimiento"></ValidationMessage>
+				</div>
+			</div>
 
-        <button class="btn btn-primary mt-5"
-                @onclick="Guardar">
-            Guardar
-        </button>
-    </div>
-</div>
+			@*footer*@
+			<div class="card-footer text-center mt-2">
+				<a href="/EstudianteIndex" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
+				<button type="submit" class="btn btn-primary bi bi-floppy">Guardar</button>
+			</div>
 
-@code {
-    private Estudiante estudiante = new Estudiante();
+		</div>
+	</div>
 
-    private async Task Guardar()
-    {
-        bool resultado = await estudianteServices.Guardar(estudiante);
+</EditForm>
+@Mensaje
 
-        if (resultado)
-        {
-            estudiante = new Estudiante();
-        }
-    }
+@code{
+	private Estudiante estudiante = new Estudiante();
+	public string Mensaje { get; set; } = string.Empty;
+
+	private async Task Guardar()
+	{
+		bool creado = await estudianteS.Guardar(estudiante);
+
+		if (creado)
+		{
+			toastServices.ShowSuccess("El estudiante ha sido agregado correctamente");
+			navigationManager.NavigateTo("/EstudianteIndex");
+		} 
+		else if (estudianteS.Buscar(estudiante.EstudianteId) != null)
+		{
+			toastServices.ShowError("El estudiante ya existe en el registro");
+		}
+		else
+		{
+			toastServices.ShowError("Error al agregar al estudiante");
+		}
+	}
 }
+
+
