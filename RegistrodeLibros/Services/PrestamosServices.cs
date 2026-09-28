@@ -56,14 +56,14 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
     public async Task<PrestamoLibros?> Buscar(int prestamoId)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Prestamos.Include(e => e.Estudiante).Include(l => l.Libros).FirstOrDefaultAsync(p => p.PrestamosId);
+        return await contexto.Prestamos.Include(e => e.estudiante).Include(l => l.libros).FirstOrDefaultAsync(p => p.PrestamosId == prestamoId);
     }
 
     public async Task<bool> Eliminar(int prestamoId)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
 
-        var prestamo = await contexto.Prestamos.FirsOrDefaultAsync(p => p.PrestamoId == prestamoId);
+        var prestamo = await contexto.Prestamos.FirstOrDefaultAsync(p => p.PrestamosId == prestamoId);
 
         if(prestamo == null)
         {
@@ -72,12 +72,12 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
         
         if(prestamo != null)
         {
-            var libro = await contexto.Libros.FirstOrDefaultAsync(l => l.LibroId == prestamo.LibroId);
+            var libro = await contexto.libros.FirstOrDefaultAsync(l => l.LibroID == prestamo.LibrosId); 
 
             if(libro != null)
             {
                 libro.Disponible = true;
-                contexto.Libros.Uptdate(libro);
+                contexto.libros.Update(libro);
                 await contexto.SaveChangesAsync();
             }
         }
@@ -88,7 +88,7 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
     public async Task<List<PrestamoLibros>> GetList(Expression<Func<PrestamoLibros, bool>> criterio)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Prestamos.Include(e => e.Estudiante).Include(l => l.Libros).Where(criterio).AsNoTracking().ToListAsync();
+        return await contexto.Prestamos.Include(e => e.estudiante).Include(l => l.libros).Where(criterio).AsNoTracking().ToListAsync();
     }
 
     Task<bool> IService<PrestamoLibros, int>.Guardar(PrestamoLibros entidad)
