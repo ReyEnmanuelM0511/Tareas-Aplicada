@@ -16,6 +16,7 @@ builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 
 builder.Services.AddScoped<LibrosServices>();
 builder.Services.AddScoped<EstudiantesServices>();
+builder.Services.AddScoped<PrestamosServices>();
 
 
 builder.Services.AddBlazorBootstrap();
