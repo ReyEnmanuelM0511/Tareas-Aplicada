@@ -50,7 +50,7 @@
 
 					@*footer*@
 					<div class="card-footer text-center mt-2">
-						<a href="/EstudiantesPage/EstudianteIndex" class="btn btn-secondary mt-2"><span class="bi bi-arrow-left"></span> Volver</a>
+						<a href="/EstudianteIndex" class="btn btn-secondary mt-2"><span class="bi bi-arrow-left"></span> Volver</a>
 						<button type="submit" class="btn btn-primary bi bi-floppy mt-2">Guardar</button>
 						<button type="button" class="btn btn-danger bi bi-trash mt-2" @onclick="Eliminar">Eliminar</button>
 					</div>
@@ -96,7 +96,7 @@
 		if (Modificado)
 		{
 			toastServices.ShowSuccess("Estudiante modificado correctamente.");
-			navigationManager.NavigateTo("/EstudiantesPage/EstudianteIndex");
+			navigationManager.NavigateTo("/EstudianteIndex");
 		}
 		else
 		{
@@ -122,7 +122,7 @@
 		{
 			toastServices.ShowSuccess("Estudiante eliminado correctamente.");
 			await modal.HideAsync();
-			navigationManager.NavigateTo("/EstudiantesPage/EstudianteIndex");
+			navigationManager.NavigateTo("/EstudianteIndex");
 		}
 		else
 		{
