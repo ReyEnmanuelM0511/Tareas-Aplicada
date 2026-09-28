@@ -1,13 +1,17 @@
 @page "/LibrosIndex"
 
-@using Models
-@using Services
+@using BlazorBootstrap
+@using RegistrodeLibros.Extensors
+@using RegistrodeLibros.Models
+@using RegistrodeLibros.Services
 
 @inject LibrosServices librosS
-
+@inject ToastService toastServices
 @rendermode InteractiveServer
 
 <PageTitle>Base de Datos Literaria</PageTitle>
+<ConfirmDialog @ref="dialog"/>
+
 
 <div class="p-3 border rounded">
 
@@ -23,7 +27,7 @@
 
     </div>
 
-
+        
     <div class="row align-items-end mb-4">
 
         <div class="col-md-3">
@@ -67,32 +71,11 @@
 
             <div class="input-group">
 
-                <input class="form-control"
-                       @bind="filtro"
-                       placeholder="Buscar" />
+                <input class="form-control" @bind="filtro" placeholder="Buscar" />
 
-                <button type="button"
-                        class="btn btn-outline-primary"
-                        @onclick="Buscar">
-
-                    Buscar
-
-                </button>
+                <button type="button"class="btn btn-outline-primary bi bi -search"@onclick="Buscar"> Buscar</button>
 
             </div>
-
-        </div>
-
-
-        <div class="col-md-2">
-
-            <button type="button"
-                    class="btn btn-outline-secondary"
-                    @onclick="Limpiar">
-
-                Limpiar
-
-            </button>
 
         </div>
 
@@ -125,164 +108,105 @@
 
             <tbody>
 
-                @if (libros.Count == 0)
-                {
+                @foreach(var libro in libros){
                     <tr>
-
-                        <td colspan="5"
-                            class="text-center text-muted">
-
-                            No se encontraron libros.
-
+                        <td>@libro.LibroID</td>
+                        <td>@libro.Titulo</td>
+                        <td>@libro.Autor</td>
+                        <td>@libro.AnoPublicacion</td>
+                        <td>
+                            <a href="@($"/modificarLibro/{libro.LibroID}")" class="btn btn-primary bi bi-pencil-square" ></a>
+                            <button class="btn btn-danger bi bi-trash" @onclick="() => Eliminar(libro)"></button>
                         </td>
-
                     </tr>
                 }
-                else
-                {
-                    @foreach (var libro in libros)
-                    {
-                        <tr>
-                            <td>
-                                @libro.LibroID
-                            </td>
-                            <td>
-                                @libro.Titulo
-                            </td>
-                            <td>
-                                @libro.Autor
-                            </td>
-                            <td>
-                                @libro.AnoPublicacion
-                            </td>
-
-                            <td>
-                                <a href="@($"/modificarLibro/{libro.LibroID}")"
-                                   class="btn btn-primary btn-sm me-1"
-                                   title="Editar">
-
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-
-                                <button type="button"
-                                        class="btn btn-danger btn-sm"
-                                        title="Eliminar"
-                                        @onclick="() => Eliminar(libro)">
-
-                                    <i class="bi bi-trash"></i>
-
-                                </button>
-
-                            </td>
-
-                        </tr>
-                    }
-                }
-
             </tbody>
-
         </table>
-
     </div>
+    <p style="margin-top: 10px;">Cantidad: @libros.Count</p>
 
 </div>
 
 
 @code {
 
+    private ConfirmDialog dialog = default!;
     private List<Libros> libros = new();
 
     private string filtro { get; set; } = string.Empty;
-
     private string filtroPor { get; set; } = string.Empty;
 
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        CargarLibros();
+        libros = await librosS.GetList(l => true);
     }
-
-
-    private void CargarLibros()
-    {
-        libros = librosS.Listar(l => true);
-    }
-
 
     private async Task Eliminar(Libros libro)
     {
+
+        var opciones = new ConfirmDialogOptions
+        {
+            YesButtonText = "Eliminar",
+            YesButtonColor = ButtonColor.Danger,
+            NoButtonText = "Cancelar",
+            NoButtonColor = ButtonColor.Secondary,
+            IsVerticallyCentered = true
+        };
+
+        bool confirmar = await dialog.ShowAsync(
+            title: "Eliminar libro",
+            message1: $"¿Está seguro de que desea eliminar \"{libro.Titulo}\"?",
+            confirmDialogOptions: opciones);
+
+        if (!confirmar)
+            return;
+
+
         bool resultado = await librosS.Eliminar(libro.LibroID);
 
         if (resultado)
         {
-            CargarLibros();
+            libros = await librosS.GetList(l => true);
+            toastServices.ShowSuccess("Libro eliminado correctamente.");
         }
-    }
-
-
-    private void Buscar()
-    {
-        if (string.IsNullOrWhiteSpace(filtro))
-        {
-            CargarLibros();
-            return;
-        }
-
-
-        string texto = filtro.Trim();
-
-
-        if (filtroPor == "Autor")
-        {
-            libros = librosS.Listar(l =>
-                l.Autor != null &&
-                l.Autor.ToLower().Contains(texto.ToLower()));
-        }
-
-
-        else if (filtroPor == "Titulo")
-        {
-            libros = librosS.Listar(l =>
-                l.Titulo != null &&
-                l.Titulo.ToLower().Contains(texto.ToLower()));
-        }
-
-
-        else if (filtroPor == "LibroID")
-        {
-            if (int.TryParse(texto, out int id))
-            {
-                libros = librosS.Listar(l =>
-                    l.LibroID == id);
-            }
-            else
-            {
-                libros = new List<Libros>();
-            }
-        }
-
-
-        else if (filtroPor == "AnioPublicacion")
-        {
-            libros = librosS.Listar(l =>
-                l.AnoPublicacion == texto);
-        }
-
-
         else
         {
-            CargarLibros();
+            toastServices.ShowError("Error al eliminar el libro.");
         }
     }
 
-
-    private void Limpiar()
+    private async Task Buscar()
     {
-        filtro = string.Empty;
+        if (filtro == "")
+        {
+            libros = await librosS.GetList(l => true);
+        }
+        else if (filtro.Trim() != "" && filtroPor == "Autor")
+        {
+            libros = await librosS.GetList(l =>
+                l.Autor.ToLower().Contains(filtro.ToLower()));
+        }
+        else if (filtro.Trim() != "" && filtroPor == "Titulo")
+        {
+            libros = await librosS.GetList(l =>
+                l.Titulo.ToLower().Contains(filtro.ToLower()));
+        }
+        else if (filtroPor == "LibroId")
+        {
+            if (int.TryParse(filtro, out int id))
+            {
+                libros = await librosS.GetList(l => l.LibroID == id);
+            }
+        }
+        else if (filtroPor == "AnioPublicacion")
+        {
+            if (int.TryParse(filtro, out int anio))
+            {
+                libros = await librosS.GetList(l => l.AnoPublicacion == anio);
+            }
+        }
 
-        filtroPor = string.Empty;
-
-        CargarLibros();
     }
+
 
 }

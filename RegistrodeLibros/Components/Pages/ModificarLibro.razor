@@ -139,7 +139,7 @@
     private string mensaje = string.Empty;
 
     private string claseMensaje = "alert-success";
-
+    
 
     protected override async Task OnParametersSetAsync()
     {
@@ -175,7 +175,7 @@
         }
 
 
-        if (string.IsNullOrWhiteSpace(libro.AnoPublicacion))
+        if (libro.AnoPublicacion == 0)
         {
             mensaje = "Debe ingresar el año de publicación.";
 

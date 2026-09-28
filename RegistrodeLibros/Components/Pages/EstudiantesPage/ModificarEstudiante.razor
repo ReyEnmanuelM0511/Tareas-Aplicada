@@ -1,4 +1,4 @@
-﻿@page "/modificarEstudiante/{id}"
+﻿@page "/EstudiantesPage/modificarEstudiante/{EstudianteId:int}"
 
 @using RegistrodeLibros.Models
 @using RegistrodeLibros.Services
@@ -9,201 +9,125 @@
 @rendermode InteractiveServer
 
 <PageTitle>Modificar Estudiante</PageTitle>
+<EditForm Model="estudiante" OnValidSubmit="Modificar">
+	<DataAnnotationsValidator />
+		<div class="container">
+			<div class="card shadow-lg">
+				<div calss="2card-header text-center">
+					<h3 class="card-title">Modificar Estudiante</h3>
+				</div>
 
+				<div class="card-body">
+					@*EstudainteId*@
+					<div class="mb-3">
+						<label class="form-label"><strong>EstudainteId</strong></label>
+						<InputNumber class="form-control" @bind-Value="estudiante.EstudianteId" readonly></InputNumber>
+					</div>
 
-<div class="p-4 border rounded">
+					@*Nombres*@
+					<div class="mb-3">
+						<label class="form-label"><strong>Nombres</strong></label>
+						<InputText class="form-control" @bind-Value="estudiante.Nombres"></InputText>
+					</div>
 
-    <h3 class="mb-4">
-        Modificar Estudiante
-    </h3>
+					@*Direccion*@
+					<div class="mb-3">
+						<label class="form-label"><strong>Direccion</strong></label>
+						<InputText class="form-control" @bind-Value="estudiante.Direccion"></InputText>
+					</div>
 
+					@*Email*@
+					<div class="mb-3">
+						<label class="form-label"><strong>Email</strong></label>
+						<InputText class="form-control" @bind-Value="estudiante.Email"></InputText>
+					</div>
 
-    @if (estudiante == null)
-    {
-        <div class="alert alert-warning">
-            Estudiante no encontrado.
-        </div>
+					@*Fecha de Nacimiento*@
+					<div class="mb-3">
+						<label class="form-label"><strong>Fecha de Nacimiento</strong></label>
+						<InputDate class="form-control" @bind-Value="estudiante.FechaNacimiento"></InputDate>
+					</div>
 
-        <a href="/EstudiantesIndex"
-           class="btn btn-secondary">
+					@*footer*@
+					<div class="card-footer text-center mt-2">
+						<a href="/EstudiantesPage/EstudianteIndex" class="btn btn-secondary mt-2"><span class="bi bi-arrow-left"></span> Volver</a>
+						<button type="submit" class="btn btn-primary bi bi-floppy mt-2">Guardar</button>
+						<button type="button" class="btn btn-danger bi bi-trash mt-2" @onclick="Eliminar">Eliminar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+</EditForm>
 
-            Volver
+<Modal @ref="modal" Title="Confirmar Eliminacion">
+	<BodyTemplate>
+		¿Estas seguro que deseas eliminar al estudiante "@estudiante.Nombres"?
+	</BodyTemplate>
 
-        </a>
-    }
-    else
-    {
-        <div class="mb-3">
+	<FooterTemplate>
+		<Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick"> No </Button>
+		<Button Color="ButtonColor.Danger" @onclick="MostrarModal"> Sí </Button>
+	</FooterTemplate>
+</Modal>
 
-            <label class="form-label">
-                EstudianteID
-            </label>
+@code{
+	[Parameter]
 
-            <input type="number"
-                   class="form-control"
-                   value="@estudiante.EstudianteId"
-                   disabled />
+	public int EstudianteId { get; set; }
 
-        </div>
+	private Estudiante estudiante { get; set; } = new Estudiante();
 
+	private Modal modal;
 
-        
-        <div class="mb-3">
+	protected override async Task OnInitializedAsync()
+	{
+		var estudianteEncontrado = await estudianteS.Buscar(EstudianteId);
 
-            <label class="form-label">
-                Nombre
-            </label>
+		if(estudianteEncontrado != null)
+		{
+			estudiante = estudianteEncontrado;
+		}
+	}
 
-            <input type="text"
-                   class="form-control"
-                   @bind="estudiante.Nombres"
-                   placeholder="Ingrese el nombre" />
+	private async Task Modificar()
+	{
+		bool Modificado = await estudianteS.Guardar(estudiante);
 
-        </div>
+		if (Modificado)
+		{
+			toastServices.ShowSuccess("Estudiante modificado correctamente.");
+			navigationManager.NavigateTo("/EstudiantesPage/EstudianteIndex");
+		}
+		else
+		{
+			toastServices.ShowError("Error al modificar al estudiante");
+		}
+	}
 
+	private async Task MostrarModal()
+	{
+		await modal.ShowAsync();
+	}
 
-        
-        <div class="mb-3">
+	private async Task OnHideModalClick()
+	{
+		await modal.HideAsync();
+	}
 
-            <label class="form-label">
-                Dirección
-            </label>
+	private async Task Eliminar()
+	{
+		bool Eliminado = await estudianteS.Eliminar(estudiante.EstudianteId);
 
-            <input type="text"
-                   class="form-control"
-                   @bind="estudiante.Direccion"
-                   placeholder="Ingrese la dirección" />
-
-        </div>
-
-
-     
-        <div class="mb-3">
-
-            <label class="form-label">
-                Email
-            </label>
-
-            <input type="email"
-                   class="form-control"
-                   @bind="estudiante.Email"
-                   placeholder="Ingrese el email" />
-
-        </div>
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Fecha de Nacimiento
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   @bind="estudiante.FechaNacimiento"
-                   placeholder="Ejemplo: 10-20-2000" />
-
-        </div>
-
-
-       
-        <div class="d-flex justify-content-center gap-3 mt-4">
-
-            <a href="/EstudiantesIndex"
-               class="btn btn-secondary">
-
-                Volver
-
-            </a>
-
-
-            <button type="button"
-                    class="btn btn-primary"
-                    @onclick="GuardarCambios">
-
-                Guardar Cambios
-
-            </button>
-
-        </div>
-
-
-        @if (!string.IsNullOrEmpty(mensaje))
-        {
-            <div class="alert @claseMensaje mt-4">
-                @mensaje
-            </div>
-        }
-
-    }
-
-</div>
-
-
-@code {
-
-    [Parameter]
-    public int Id { get; set; }
-
-
-    private Estudiante? estudiante;
-
-    private string mensaje = string.Empty;
-
-    private string claseMensaje = "alert-success";
-
-
-    protected override async Task OnParametersSetAsync()
-    {
-        estudiante = await estudianteService.Buscar(Id);
-    }
-
-
-    private async Task GuardarCambios()
-    {
-        if (estudiante == null)
-        {
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(estudiante.Nombres))
-        {
-            mensaje = "Debe ingresar el nombre del estudiante.";
-            claseMensaje = "alert-danger";
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(estudiante.Direccion))
-        {
-            mensaje = "Debe ingresar la dirección del estudiante.";
-            claseMensaje = "alert-danger";
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(estudiante.Email))
-        {
-            mensaje = "Debe ingresar el email del estudiante.";
-            claseMensaje = "alert-danger";
-            return;
-        }
-
-        if (estudiante.FechaNacimiento == null)
-        {
-            mensaje = "Debe ingresar la fecha de nacimiento del estudiante.";
-            claseMensaje = "alert-danger";
-            return;
-        }
-
-        bool resultado = await estudianteService.Modificar(estudiante);
-
-        if (resultado)
-        {
-            Navigation.NavigateTo("/EstudiantesIndex");
-        }
-        else
-        {
-            mensaje = "No se pudieron guardar los cambios.";
-            claseMensaje = "alert-danger";
-        }
-
-    }
+		if (Eliminado)
+		{
+			toastServices.ShowSuccess("Estudiante eliminado correctamente.");
+			await modal.HideAsync();
+			navigationManager.NavigateTo("/EstudiantesPage/EstudianteIndex");
+		}
+		else
+		{
+			toastServices.ShowError("Error al eliminar el estudiante");
+		}
+	}
 }
+
