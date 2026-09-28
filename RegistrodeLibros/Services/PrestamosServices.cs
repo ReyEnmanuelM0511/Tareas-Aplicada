@@ -41,7 +41,7 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
         return await contexto.SaveChangesAsync() > 0;
     }
 
-    private async Task<bool> Guardar (PrestamoLibros prestamo)
+    public async Task<bool> Guardar (PrestamoLibros prestamo)
     {
         if (!await Existe(prestamo.PrestamosId))
         {
