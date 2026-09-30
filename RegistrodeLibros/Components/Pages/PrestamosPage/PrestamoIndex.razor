@@ -67,7 +67,7 @@
                     <TemplateColumn Title="Opciones">
                         <a href="/Prestamos/Modificar/@context.EstudianteId" class="btn btn-outline-primary bi bi-pencil-square"></a>
 
-                        <button class="btn btn-outline-danger bi bi-trash" @onclick="() => MostrarModal(context)"></button>
+                        <button class="btn btn-outline-danger bi bi-trash" data-bs-toggle="modal" data-bs-target="#Modal"  @onclick="() => prestamoSeleccionado = context" data-bs-dismiss="Modal"></button>
                     </TemplateColumn>
                 </QuickGrid>
             </div>
@@ -82,7 +82,25 @@
 
 </div>
 
-@* Modal de confirmación *@
+<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmacion de Elminicacion</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" @onclick="Eliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@* Modal de confirmación
 <Modal @ref="modal" Title="Confirmar Eliminación">
 
     <BodyTemplate>
@@ -94,12 +112,12 @@
         <Button Color="ButtonColor.Danger" @onclick="Eliminar"> Si </Button>
     </FooterTemplate>
 
-</Modal>
+</Modal> *@
 
 @code {
     private List<PrestamoLibros> prestamos = new();
     private PrestamoLibros prestamoSeleccionado = new();
-    private Modal modal;
+   
 
     private string Filtro { get; set; } = string.Empty;
     private string ValorFiltro { get; set; } = string.Empty;
@@ -109,17 +127,17 @@
         prestamos = await prestamoS.GetList(p => true);
     }
 
-    private async Task MostrarModal(PrestamoLibros prestamo)
-    {
-        prestamoSeleccionado = prestamo;
-        await modal.ShowAsync();
-    }
+    // private async Task MostrarModal(PrestamoLibros prestamo)
+    // {
+    //     prestamoSeleccionado = prestamo;
+    //     await modal.ShowAsync();
+    // }
 
 
-    private async Task OnHideModalClick()
-    {
-        await modal.HideAsync();
-    }
+    // private async Task OnHideModalClick()
+    // {
+    //     await modal.HideAsync();
+    // }
 
     private async Task Eliminar()
     {
@@ -129,7 +147,7 @@
         {
             prestamos = await prestamoS.GetList(p => true);
             toastServices.ShowSuccess("Préstamo eliminado correctamente.");
-            await modal.HideAsync();
+            // await modal.HideAsync();
         }
         else
         {
