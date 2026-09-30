@@ -24,10 +24,10 @@
 				<div class="mb-3">
 					<label class="form-label"><strong>Estudiante</strong></label>
 					<InputSelect class="form-control form-select" @bind-Value="prestamo.EstudianteId" readonly>
-						<opcion> Elija una opci&oacute;n </opcion>
+						<option> Elija una opci&oacute;n </option>
 						@foreach(var estudiante in estudiantes)
 						{
-							<opcion value="@estudiante.EstudianteId">@estudiante.Nombres</opcion>
+							<option value="@estudiante.EstudianteId">@estudiante.Nombres</option>
 						}
 					</InputSelect>
 					<ValidationMessage For="() => prestamo.EstudianteId"></ValidationMessage>
@@ -37,10 +37,10 @@
 				<div class="mb-3">
 					<label class="form-label"><strong>Libro</strong></label>
 					<InputSelect class="form-control form-select" @bind-Value="prestamo.LibrosId" readonly>
-						<opcion> Elija una opci&oacute;n </opcion>
+						<option> Elija una opci&oacute;n </option>
 						@foreach (var libro in libros)
 						{
-							<opcion value="@libro.LibroID">@libro.Titulo</opcion>
+							<option value="@libro.LibroID">@libro.Titulo</option>
 						}
 					</InputSelect>
 					<ValidationMessage For="() => prestamo.LibrosId"></ValidationMessage>
@@ -69,7 +69,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		estudiantes = await estudianteS.GetList(e => e.EstudianteId > 0);
-		libros = await libroService.GetList(l => l.LibroID > 0 && l.Disponible == true);
+		libros = await libroService.GetList(l => l.LibroID > 0 && l.Disponible); //&& l.Disponible == true);
 	}
 
 	private async Task Guardar()
