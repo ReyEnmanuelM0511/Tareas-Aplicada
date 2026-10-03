@@ -1,10 +1,11 @@
 ﻿namespace RegistrodeLibros.Models;
 
 using System.ComponentModel.DataAnnotations;
-public class Estudiante
+public class Estudiantes
     {
     [Key]
     public int EstudianteId { get; set; }
+
     [Required(ErrorMessage = "Este campo es obligatorio")]
     public string Nombres { get; set; } = null!;
 
