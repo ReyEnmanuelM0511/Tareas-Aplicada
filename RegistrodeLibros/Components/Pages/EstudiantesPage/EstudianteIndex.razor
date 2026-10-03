@@ -60,7 +60,7 @@
 
             <div class="grid mt-3">
                 <QuickGrid Items="@estudiante.AsQueryable()">
-                    <PropertyColumn TGridItem="Models.Estudiante" TProp="int" Property="@(e => e.EstudianteId)" title="ID" Sortable="true" />
+                    <PropertyColumn TGridItem="Models.Estudiantes" TProp="int" Property="@(e => e.EstudianteId)" title="ID" Sortable="true" />
                     <PropertyColumn Property="@(e => e.Nombres)" title="Nombre" Sortable="true" />
                     <PropertyColumn Property="@(e => e.Direccion)" title="Dirección" Sortable="true" />
                     <PropertyColumn Property="@(e => e.Email)" title="Email" Sortable="true" />
@@ -96,8 +96,8 @@
 @code {
 
     private Modal modal;
-    private List<Estudiante> estudiante = new();
-    private Estudiante estudianteSeleccionado = new();
+    private List<Estudiantes> estudiante = new();
+    private Estudiantes estudianteSeleccionado = new();
 
 
     private string filtro { get; set; } = string.Empty;
@@ -108,7 +108,7 @@
         estudiante = await estudianteS.GetList(l => true);
     }
 
-    private async Task MostrarModal(Estudiante estudiante)
+    private async Task MostrarModal(Estudiantes estudiante)
     {
         estudianteSeleccionado = estudiante;
         await modal.ShowAsync();
