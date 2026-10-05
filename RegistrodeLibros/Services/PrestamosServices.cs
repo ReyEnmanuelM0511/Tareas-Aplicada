@@ -30,8 +30,6 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
 
         contexto.Prestamos.Add(prestamolibros);
         return await contexto.SaveChangesAsync() > 0;
-
-        
     }
 
     private async Task<bool> Modificar(PrestamoLibros prestamo)
