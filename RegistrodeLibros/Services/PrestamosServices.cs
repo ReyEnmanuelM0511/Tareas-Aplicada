@@ -16,7 +16,7 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
     private async Task<bool> Insertar(PrestamoLibros prestamolibros)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        var libro = await contexto.libros.FirstOrDefaultAsync(l => l.LibroID == prestamolibros.LibrosId);
+        var libro = await contexto.Libros.FirstOrDefaultAsync(l => l.LibroID == prestamolibros.LibrosId);
 
         if(libro == null || !libro.Disponible)
         {
@@ -24,7 +24,7 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
         }
 
         libro.Disponible = false;
-        contexto.libros.Update(libro);
+        contexto.Libros.Update(libro);
 
         contexto.Prestamos.Add(prestamolibros);
         return await contexto.SaveChangesAsync() > 0;
@@ -68,12 +68,12 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
         
         if(prestamo != null)
         {
-            var libro = await contexto.libros.FirstOrDefaultAsync(l => l.LibroID == prestamo.LibrosId); 
+            var libro = await contexto.Libros.FirstOrDefaultAsync(l => l.LibroID == prestamo.LibrosId); 
 
             if(libro != null)
             {
                 libro.Disponible = true;
-                contexto.libros.Update(libro);
+                contexto.Libros.Update(libro);
                 await contexto.SaveChangesAsync();
             }
         }

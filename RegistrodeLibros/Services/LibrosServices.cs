@@ -24,7 +24,7 @@ public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IServi
     public async Task<bool> Insertar(Libros libro)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        _context.libros.Add(libro);
+        _context.Libros.Add(libro);
         return await _context.SaveChangesAsync() > 0;
     }
 
@@ -38,25 +38,25 @@ public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IServi
     public async Task<Libros> Buscar(int id)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.libros.FirstOrDefaultAsync(l => l.LibroID == id);
+        return await _context.Libros.FirstOrDefaultAsync(l => l.LibroID == id);
     }
 
     public async Task<bool> Eliminar(int id)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.libros.Where(l => l.LibroID == id).ExecuteDeleteAsync() > 0;
+        return await _context.Libros.Where(l => l.LibroID == id).ExecuteDeleteAsync() > 0;
     }
 
     public async Task<List<Libros>> GetList(Expression<Func<Libros, bool>> criterio)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.libros.Where(criterio).AsNoTracking().ToListAsync();
+        return await _context.Libros.Where(criterio).AsNoTracking().ToListAsync();
     }
 
     private async Task<bool> Existe(int? id)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.libros
+        return await contexto.Libros
             .AnyAsync(e => e.LibroID == id);
     }
 }
