@@ -96,5 +96,3 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
         return Guardar(entidad);
     }
 }
-    
-

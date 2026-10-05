@@ -1,11 +1,12 @@
-﻿namespace RegistrodeLibros.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-using System.ComponentModel.DataAnnotations;
+
+namespace RegistrodeLibros.Models;
+
 public class Estudiantes
     {
     [Key]
     public int EstudianteId { get; set; }
-
     [Required(ErrorMessage = "Este campo es obligatorio")]
     public string Nombres { get; set; } = null!;
 
@@ -18,4 +19,3 @@ public class Estudiantes
     [Required(ErrorMessage = "Este campo es obligatorio")]
     public DateOnly FechaNacimiento { get; set; }
 }
-

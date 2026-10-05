@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class PrestamoLibros
 {
     [Key]
+
     public int PrestamosId { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un estudiante valido")]
@@ -19,4 +20,3 @@ public class PrestamoLibros
     [ForeignKey("LibrosId")]
     public virtual Libros libros { get; set; } = null!;
 }
-
