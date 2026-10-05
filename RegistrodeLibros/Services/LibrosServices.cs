@@ -53,7 +53,7 @@ public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IServi
         return await _context.Libros.Where(criterio).AsNoTracking().ToListAsync();
     }
 
-    private async Task<bool> Existe(int? id)
+    private async Task<bool> Existe(int id)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Libros
