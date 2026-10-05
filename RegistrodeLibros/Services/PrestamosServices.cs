@@ -1,11 +1,10 @@
-﻿namespace RegistrodeLibros.Services;
-
-using RegistrodeLibros.Models;
+﻿using RegistrodeLibros.Models;
 using RegistrodeLibros.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Aplicada1.Core;
 
+namespace RegistrodeLibros.Services;
 public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : IService<PrestamoLibros, int>
 {
     private async Task<bool> Existe(int prestamosId)
