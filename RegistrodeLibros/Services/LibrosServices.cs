@@ -8,7 +8,6 @@ using System.Linq.Expressions;
 
 public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IService<Libros, int>
 {
-
     public async Task<bool> Guardar(Libros librito)
     {
         if (!await Existe(librito.LibroID))
