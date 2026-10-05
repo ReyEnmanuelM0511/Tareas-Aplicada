@@ -1,10 +1,11 @@
-namespace RegistrodeLibros.Services;
-
 using Aplicada1.Core;
-using Context;
+using RegistrodeLibros.Context;
 using Microsoft.EntityFrameworkCore;
 using RegistrodeLibros.Models;
 using System.Linq.Expressions;
+
+
+namespace RegistrodeLibros.Services;
 
 public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IService<Libros, int>
 {
@@ -33,7 +34,6 @@ public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IServi
         _context.Update(libros);
         return await _context.SaveChangesAsync() > 0;
     }
-
 
     public async Task<Libros> Buscar(int id)
     {
