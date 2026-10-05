@@ -5,7 +5,6 @@ namespace RegistrodeLibros.Models;
 public class PrestamoLibros
 {
     [Key]
-
     public int PrestamosId { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un estudiante valido")]
