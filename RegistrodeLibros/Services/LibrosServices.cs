@@ -43,7 +43,6 @@ public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IServi
 
     public async Task<bool> Eliminar(int id)
     {
-
         await using var _context = await contextFactory.CreateDbContextAsync();
         return await _context.libros.Where(l => l.LibroID == id).ExecuteDeleteAsync() > 0;
     }
