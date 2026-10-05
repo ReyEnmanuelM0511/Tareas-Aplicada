@@ -17,7 +17,6 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
     private async Task<bool> Insertar(PrestamoLibros prestamolibros)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-
         var libro = await contexto.libros.FirstOrDefaultAsync(l => l.LibroID == prestamolibros.LibrosId);
 
         if(libro == null || !libro.Disponible)
@@ -30,8 +29,6 @@ public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : ISe
 
         contexto.Prestamos.Add(prestamolibros);
         return await contexto.SaveChangesAsync() > 0;
-
-        
     }
 
     private async Task<bool> Modificar(PrestamoLibros prestamo)
