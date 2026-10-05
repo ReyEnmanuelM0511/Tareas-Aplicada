@@ -9,29 +9,29 @@ namespace RegistrodeLibros.Services;
 
 public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IService<Libros, int>
 {
-    public async Task<bool> Guardar(Libros librito)
+    public async Task<bool> Guardar(Libros Libro)
     {
-        if (!await Existe(librito.LibroID))
+        if (!await Existe(Libro.LibroID))
         {
-            return await Insertar(librito);
+            return await Insertar(Libro);
         }
         else
         {
-            return await Modificar(librito);
+            return await Modificar(Libro);
         }
     }
 
-    public async Task<bool> Insertar(Libros libro)
+    public async Task<bool> Insertar(Libros Libro)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        _context.Libros.Add(libro);
+        _context.Libros.Add(Libro);
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> Modificar(Libros libros)
+    public async Task<bool> Modificar(Libros Libro)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        _context.Update(libros);
+        _context.Update(Libro);
         return await _context.SaveChangesAsync() > 0;
     }
 
@@ -53,7 +53,7 @@ public class LibrosServices(IDbContextFactory<Contexto> contextFactory) : IServi
         return await _context.Libros.Where(criterio).AsNoTracking().ToListAsync();
     }
 
-    private async Task<bool> Existe(int? id)
+    private async Task<bool> Existe(int id)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Libros

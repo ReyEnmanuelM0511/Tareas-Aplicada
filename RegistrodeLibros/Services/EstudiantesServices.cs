@@ -24,7 +24,7 @@ public class EstudiantesServices(IDbContextFactory<Contexto> contextFactory) : I
     public async Task<bool> Insertar(Estudiantes estudiante)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        _context.estudiantes.Add(estudiante);
+        _context.Estudiantes.Add(estudiante);
         return await _context.SaveChangesAsync() > 0;
     }
 
@@ -39,26 +39,26 @@ public class EstudiantesServices(IDbContextFactory<Contexto> contextFactory) : I
     public async Task<Estudiantes> Buscar(int id)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.estudiantes.FirstOrDefaultAsync(e => e.EstudianteId == id);
+        return await _context.Estudiantes.FirstOrDefaultAsync(e => e.EstudianteId == id);
     }
 
     public async Task<bool> Eliminar(int id)
     {
 
         await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.estudiantes.Where(e => e.EstudianteId == id).ExecuteDeleteAsync() > 0;
+        return await _context.Estudiantes.Where(e => e.EstudianteId == id).ExecuteDeleteAsync() > 0;
     }
 
     public async Task<List<Estudiantes>> GetList(Expression<Func<Estudiantes, bool>> criterio)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.estudiantes.Where(criterio).AsNoTracking().ToListAsync();
+        return await _context.Estudiantes.Where(criterio).AsNoTracking().ToListAsync();
     }
 
     private async Task<bool> Existe(int? id)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.estudiantes
+        return await contexto.Estudiantes
             .AnyAsync(e => e.EstudianteId == id);
     }
 }
