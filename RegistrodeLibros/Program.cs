@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RegistrodeLibros.Components;
 using RegistrodeLibros.Extensors;
 using RegistrodeLibros.Services;
+using RegistroLibros.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 builder.Services.AddScoped<LibrosServices>();
 builder.Services.AddScoped<EstudiantesServices>();
 builder.Services.AddScoped<PrestamosServices>();
-
+builder.Services.AddScoped<DevolucionesServices>();
 
 builder.Services.AddBlazorBootstrap();
 

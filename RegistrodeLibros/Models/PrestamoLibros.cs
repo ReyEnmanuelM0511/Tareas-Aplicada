@@ -13,6 +13,9 @@ public class PrestamoLibros
     [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un libro valido")]
     public int LibrosId { get; set; }
 
+    [Required(ErrorMessage = "Este campo es obligatorio")]
+    public DateOnly Fecha { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
     [ForeignKey("EstudianteId")]
     public virtual Estudiantes estudiante { get; set; } = null!;
 
