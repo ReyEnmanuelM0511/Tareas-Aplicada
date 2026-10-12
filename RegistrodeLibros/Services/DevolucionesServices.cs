@@ -1,10 +1,10 @@
 ﻿using Aplicada1.Core;
 using Microsoft.EntityFrameworkCore;
 using RegistrodeLibros.Context;
-using RegistroLibros.Models;
+using RegistrodeLibros.Models;
 using System.Linq.Expressions;
 
-namespace RegistroLibros.Services;
+namespace RegistrodeLibros.Services;
 
 public class DevolucionesServices(IDbContextFactory<Contexto> contextFactory) : IServiceResult<Devoluciones, int>
 {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using RegistrodeLibros.Models;
 
-namespace RegistroLibros.Models;
+namespace RegistrodeLibros.Models;
 
 public class Devoluciones
 {
