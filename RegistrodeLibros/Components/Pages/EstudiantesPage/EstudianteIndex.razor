@@ -3,176 +3,123 @@
 
 <PageTitle>Base de Datos Estudiantil</PageTitle>
 
-
 <div class="container">
-
     <div class="card shadow-lg">
         <div class="card-header d-flex justify-content-between align-center mb-4">
-            <h3 class="card-title"> Listado de Estudiantes</h3>
+            <h3 class="card-title">Listado de Estudiantes</h3>
 
             <a href="/crearEstudiante" class="btn btn-primary">
-                <span class="bi bi-plus-square mt-3"></span>Agregar Estudiante
+                <span class="bi bi-plus-square mt-3"></span> Agregar Estudiante
             </a>
-
         </div>
 
-        
-        <div class="row align-items-end mb-4">
-
+        <div class="card-body">
             @*labels*@
-            <div class="col-md-3">
-
+            <div class="row">
                 @*Filtrar por*@
-                <div>
-                    <label class="form-label">
+                <div class="col-3">
+                    <label class="col-form-label">
                         <strong>Filtrar por</strong>
                     </label>
-                </div> 
+                </div>
 
                 @*ValorFiltro*@
                 <div class="col-4">
-                    <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
+                    <label class="col-form-label">
+                        <strong>Búsqueda</strong>
+                    </label>
                 </div>
             </div>
 
-            @*inputs y botones*@
+            @*Inputs y botones*@
             <div class="row align-items-center">
-
                 @*filtro*@
                 <div class="col-3">
-                    <InputSelect class="form-select" @bind-Value="ValorFiltro">
-                        <option value="" selected disabled>Elija una opci&oacute;n</option>
-                        <option value="Id">ID</option>  
+                    <InputSelect class="form-select" @bind-Value="filtro">
+                        <option value="" selected disabled>Elija una opción</option>
+                        <option value="Id">ID</option>
                         <option value="Nombre">Nombre</option>
                         <option value="Email">Email</option>
                     </InputSelect>
                 </div>
 
                 @*Busqueda*@
-                <div class="input-group">
+                <div class="col-4">
                     <div class="input-group">
                         <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
-                        <button type="button" class="btn btn-outline-primary bi bi -search" @onclick="Buscar"> Buscar</button>
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
                     </div>
                 </div>
-
             </div>
 
             <div class="grid mt-3">
-                <QuickGrid Items="@estudiante.AsQueryable()">
-                    <PropertyColumn TGridItem="Models.Estudiantes" TProp="int" Property="@(e => e.EstudianteId)" title="ID" Sortable="true" />
-                    <PropertyColumn Property="@(e => e.Nombres)" title="Nombre" Sortable="true" />
-                    <PropertyColumn Property="@(e => e.Direccion)" title="Dirección" Sortable="true" />
-                    <PropertyColumn Property="@(e => e.Email)" title="Email" Sortable="true" />
-                    <PropertyColumn Property="@(e => e.FechaNacimiento)" title="Fecha de Nacimiento" Format="yyyy-MM-dd" Sortable="true"/>
+                <QuickGrid Items="@itemsQueryable">
+                    <PropertyColumn Property="@(e => e.EstudianteId)" Title="ID" Sortable="true" />
+                    <PropertyColumn Property="@(e => e.Nombres)" Title="Nombre" Sortable="true" />
+                    <PropertyColumn Property="@(e => e.Direccion)" Title="Dirección" Sortable="true" />
+                    <PropertyColumn Property="@(e => e.Email)" Title="Email" Sortable="true" />
+                    <PropertyColumn Property="@(e => e.FechaNacimiento)" Title="Fecha de Nacimiento" Format="yyyy-MM-dd" Sortable="true" />
+
                     <TemplateColumn Title="Acciones">
-                        <a href="@($"/EstudiantesPage/modificarEstudiante/{@context.EstudianteId}")" class="btn btn-primary bi bi-pencil-square"></a>
-                        <button class="btn btn-danger bi bi-trash" @onclick="() => MostrarModal(context)"></button>
+                        <a href="@($"/EstudiantesPage/modificarEstudiante/{context.EstudianteId}")"
+                           class="btn btn-primary bi bi-pencil-square"></a>
                     </TemplateColumn>
                 </QuickGrid>
             </div>
-
         </div>
 
-        <div class="card-footer d-flex justify-content-between align-content-center mb-4">
-            <label> Cantidad: @estudiante.Count</label>
+        <div class="card-footer d-flex justify-content-between align-center mb-4">
+            <label><strong>Cantidad:</strong> @itemsQueryable?.Count()</label>
         </div>
     </div>
 </div>
 
-
-<Modal @ref="modal" Title="Confirmar Eliminacion">
-    <BodyTemplate>
-        ¿Estas seguro que quiere Eliminar el estudiante "@estudianteSeleccionado.Nombres"?
-    </BodyTemplate>
-
-    <FooterTemplate>
-        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick"> No </Button>
-        <Button Color="ButtonColor.Danger" @onclick="Eliminar"> Sí </Button>
-    </FooterTemplate>
-</Modal>
-
-
 @code {
-
-    private Modal modal;
     private List<Estudiantes> estudiante = new();
+    private IQueryable<Estudiantes> itemsQueryable;
     private Estudiantes estudianteSeleccionado = new();
-
 
     private string filtro { get; set; } = string.Empty;
     private string ValorFiltro { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        estudiante = await estudianteS.GetList(l => true);
-    }
+        var result = await estudianteS.GetList(e => true);
 
-    private async Task MostrarModal(Estudiantes estudiante)
-    {
-        estudianteSeleccionado = estudiante;
-        await modal.ShowAsync();
-    }
+        result.OnSuccess(e => estudiante = e);
 
-    private async Task OnHideModalClick()
-    {
-        await modal.HideAsync();
-    }
-
-
-    private async Task Eliminar()
-    {
-        bool eliminado = await estudianteS.Eliminar(estudianteSeleccionado.EstudianteId);
-
-        if (eliminado)
-        {
-            estudiante = await estudianteS.GetList(e => true);
-            toastServices.ShowSuccess("Estudiante eliminado correctamente");
-            await modal.HideAsync();
-        }
-        else
-        {
-            toastServices.ShowError("Error al eliminar el estudiante");
-        }
+        itemsQueryable = estudiante.AsQueryable();
     }
 
     private async Task Buscar()
     {
         if (ValorFiltro == "")
         {
-            estudiante = await estudianteS.GetList(l => true);
+            var result = await estudianteS.GetList(e => true);
+            result.OnSuccess(e => estudiante = e);
         }
-        else if (ValorFiltro.Trim() != "" && ValorFiltro == "Nombres")
+        else if (ValorFiltro.Trim() != "" && filtro == "Id")
         {
-            estudiante = await estudianteS.GetList(l =>
-                l.Nombres.ToLower().Contains(ValorFiltro.ToLower()));
+            var result = await estudianteS.GetList(e =>
+                e.EstudianteId.ToString().Contains(ValorFiltro));
+
+            result.OnSuccess(e => estudiante = e);
         }
-        else if (ValorFiltro.Trim() != "" && ValorFiltro == "Direcccion")
+        else if (ValorFiltro.Trim() != "" && filtro == "Nombre")
         {
-            estudiante = await estudianteS.GetList(l =>
-                l.Direccion.ToLower().Contains(ValorFiltro.ToLower()));
+            var result = await estudianteS.GetList(e =>
+                e.Nombres.ToLower().Contains(ValorFiltro.ToLower()));
+
+            result.OnSuccess(e => estudiante = e);
         }
-        else if (ValorFiltro == "EstudianteId")
+        else if (ValorFiltro.Trim() != "" && filtro == "Email")
         {
-            if (int.TryParse(ValorFiltro, out int id))
-            {
-                estudiante = await estudianteS.GetList(l => l.EstudianteId == id);
-            }
-        }
-        else if (ValorFiltro == "FechaNacimiento")
-        {
-            if (DateOnly.TryParse(ValorFiltro, out DateOnly anio))
-            {
-                estudiante = await estudianteS.GetList(l => l.FechaNacimiento == anio);
-            }
-        }
-         else if (ValorFiltro.Trim() != "" && ValorFiltro == "Email")
-        {
-            estudiante = await estudianteS.GetList(l =>
-                l.Email.ToLower().Contains(ValorFiltro.ToLower()));
+            var result = await estudianteS.GetList(e =>
+                e.Email != null && e.Email.ToLower().Contains(ValorFiltro.ToLower()));
+
+            result.OnSuccess(e => estudiante = e);
         }
 
+        itemsQueryable = estudiante.AsQueryable();
     }
-
-
 }

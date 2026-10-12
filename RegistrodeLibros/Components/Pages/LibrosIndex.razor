@@ -1,212 +1,134 @@
 @page "/LibrosIndex"
 
-@using BlazorBootstrap
-@using RegistrodeLibros.Extensors
-@using RegistrodeLibros.Models
-@using RegistrodeLibros.Services
-
-@inject LibrosServices librosS
-@inject ToastService toastServices
 @rendermode InteractiveServer
 
 <PageTitle>Base de Datos Literaria</PageTitle>
-<ConfirmDialog @ref="dialog"/>
 
-
-<div class="p-3 border rounded">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h3 class="mb-0">
-            Listado de Libros
-        </h3>
-
-        <a href="/crearLibro" class="btn btn-primary">
-            Agregar Libro
-        </a>
-
-    </div>
-
-        
-    <div class="row align-items-end mb-4">
-
-        <div class="col-md-3">
-
-            <label class="form-label">
-                Filtrar por
-            </label>
-
-            <select class="form-select" @bind="filtroPor">
-
-                <option value="">
-                    Selecciona una opción
-                </option>
-
-                <option value="LibroID">
-                    LibroID
-                </option>
-
-                <option value="Titulo">
-                    Título
-                </option>
-
-                <option value="Autor">
-                    Autor
-                </option>
-
-                <option value="AnioPublicacion">
-                    Año Publicación
-                </option>
-
-            </select>
-
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header d-flex justify-content-between align-items-center mb-4">
+            <h3 class="card-title">Listado de Libros</h3>
+            <a href="/crearLibro" class="btn btn-primary"><span class="bi bi-plus-square mt-3"></span>Agregar Libro</a>
         </div>
 
+        <div class="card-body">
 
-        <div class="col-md-4">
+            <div class="row align-items-end mb-4">
 
-            <label class="form-label">
-                Buscar
-            </label>
+                <div class="col-md-3">
+                    <label class="form-label"><strong>Filtrar por</strong></label>
+                </div>
 
-            <div class="input-group">
-
-                <input class="form-control" @bind="filtro" placeholder="Buscar" />
-
-                <button type="button"class="btn btn-outline-primary bi bi -search"@onclick="Buscar"> Buscar</button>
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Búsqueda</strong></label>
+                </div>
 
             </div>
 
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="">Elija una opción</option>
+                        <option value="LibroID">LibroID</option>
+                        <option value="Titulo">Título</option>
+                        <option value="Autor">Autor</option>
+                        <option value="AnioPublicacion">Año de publicación</option>
+                    </InputSelect>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <input class="form-control"@bind="ValorFiltro"placeholder="Buscar libro..." />
+                        <button type="button"class="btn btn-outline-primary"@onclick="Buscar"><span class="bi bi-search"></span>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid mt-3">
+                <QuickGrid Items="@itemsQueryable">
+                    <PropertyColumn Property="@(l => l.LibroID)" Title="ID Libro"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.Titulo)" Title="Título"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.Autor)" Title="Autor"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.AnoPublicacion)" Title="Año de publicación"Sortable="true" />
+                    <PropertyColumn Property="@(l => l.Disponible)" Title="Disponibilidad" Sortable="true" />
+                    <TemplateColumn Title="Opciones">
+                        <a href="@($"/modificarLibro/{context.LibroID}")" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+
+        @*footer*@
+        <div class="card-footer d-flex justify-content-between align-items-center mb-4">
+            <label>Cantidad: @libros.Count</label>
         </div>
 
     </div>
-
-
-    
-    <div class="table-responsive">
-
-        <table class="table table-striped table-hover align-middle">
-
-            <thead>
-
-                <tr>
-
-                    <th>LibroID</th>
-
-                    <th>Título</th>
-
-                    <th>Autor</th>
-
-                    <th>Año de Publicación</th>
-
-                    <th>Acciones</th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                @foreach(var libro in libros){
-                    <tr>
-                        <td>@libro.LibroID</td>
-                        <td>@libro.Titulo</td>
-                        <td>@libro.Autor</td>
-                        <td>@libro.AnoPublicacion</td>
-                        <td>
-                            <a href="@($"/modificarLibro/{libro.LibroID}")" class="btn btn-primary bi bi-pencil-square" ></a>
-                            <button class="btn btn-danger bi bi-trash" @onclick="() => Eliminar(libro)"></button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    <p style="margin-top: 10px;">Cantidad: @libros.Count</p>
-
 </div>
+```
 
 
 @code {
 
     private ConfirmDialog dialog = default!;
     private List<Libros> libros = new();
+    private IQueryable<Libros> itemsQueryable = Enumerable.Empty<Libros>().AsQueryable();
 
-    private string filtro { get; set; } = string.Empty;
-    private string filtroPor { get; set; } = string.Empty;
+    private string Filtro { get; set; } = string.Empty;
+    private string ValorFiltro { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        libros = await librosS.GetList(l => true);
+        var result = await libroService.GetList(l => true);
+        result.OnSuccess(l => libros = l);
+
+        itemsQueryable = libros.AsQueryable();
     }
 
-    private async Task Eliminar(Libros libro)
-    {
-
-        var opciones = new ConfirmDialogOptions
-        {
-            YesButtonText = "Eliminar",
-            YesButtonColor = ButtonColor.Danger,
-            NoButtonText = "Cancelar",
-            NoButtonColor = ButtonColor.Secondary,
-            IsVerticallyCentered = true
-        };
-
-        bool confirmar = await dialog.ShowAsync(
-            title: "Eliminar libro",
-            message1: $"¿Está seguro de que desea eliminar \"{libro.Titulo}\"?",
-            confirmDialogOptions: opciones);
-
-        if (!confirmar)
-            return;
-
-
-        bool resultado = await librosS.Eliminar(libro.LibroID);
-
-        if (resultado)
-        {
-            libros = await librosS.GetList(l => true);
-            toastServices.ShowSuccess("Libro eliminado correctamente.");
-        }
-        else
-        {
-            toastServices.ShowError("Error al eliminar el libro.");
-        }
-    }
+   
 
     private async Task Buscar()
     {
-        if (filtro == "")
+        if (string.IsNullOrWhiteSpace(ValorFiltro))
         {
-            libros = await librosS.GetList(l => true);
+            var result = await libroService.GetList(l => true);
+            result.OnSuccess(l => libros = l);
         }
-        else if (filtro.Trim() != "" && filtroPor == "Autor")
+        else if (Filtro.Trim() == "Autor")
         {
-            libros = await librosS.GetList(l =>
-                l.Autor.ToLower().Contains(filtro.ToLower()));
+            var result = await libroService.GetList(l =>
+                l.Autor.ToLower().Contains(ValorFiltro.ToLower()));
+
+            result.OnSuccess(l => libros = l);
         }
-        else if (filtro.Trim() != "" && filtroPor == "Titulo")
+        else if (Filtro.Trim() == "Titulo")
         {
-            libros = await librosS.GetList(l =>
-                l.Titulo.ToLower().Contains(filtro.ToLower()));
+            var result = await libroService.GetList(l =>
+                l.Titulo.ToLower().Contains(ValorFiltro.ToLower()));
+
+            result.OnSuccess(l => libros = l);
         }
-        else if (filtroPor == "LibroId")
+        else if (Filtro.Trim() == "LibroId")
         {
-            if (int.TryParse(filtro, out int id))
+            if (int.TryParse(ValorFiltro, out int id))
             {
-                libros = await librosS.GetList(l => l.LibroID == id);
+                var result = await libroService.GetList(l => l.LibroID == id);
+                result.OnSuccess(l => libros = l);
             }
         }
-        else if (filtroPor == "AnioPublicacion")
+        else if (Filtro.Trim() == "AnioPublicacion")
         {
-            if (int.TryParse(filtro, out int anio))
+            if (int.TryParse(ValorFiltro, out int anio))
             {
-                libros = await librosS.GetList(l => l.AnoPublicacion == anio);
+                var result = await libroService.GetList(l =>
+                    l.AnoPublicacion == anio);
+
+                result.OnSuccess(l => libros = l);
             }
         }
 
+        itemsQueryable = libros.AsQueryable();
     }
-
-
 }
