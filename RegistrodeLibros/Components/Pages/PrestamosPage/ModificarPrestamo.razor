@@ -1,128 +1,145 @@
-﻿@page "/modificarPrestamo"
-
-
+﻿@page "/modificarPrestamo/{PrestamosId:int}"
 @rendermode InteractiveServer
 
-<PageTitle>Modificar Estudiante</PageTitle>
-<EditForm Model="estudiante" OnValidSubmit="Modificar">
-	<DataAnnotationsValidator />
-	<div class="container">
-		<div class="card shadow-lg">
-			<div calss="2card-header text-center">
-				<h3 class="card-title">Modificar Estudiante</h3>
-			</div>
+<PageTitle>Modificar Préstamo</PageTitle>
 
-			<div class="card-body">
-				@*EstudainteId*@
-				<div class="mb-3">
-					<label class="form-label"><strong>EstudainteId</strong></label>
-					<InputNumber class="form-control" @bind-Value="estudiante.EstudianteId" readonly></InputNumber>
-				</div>
+<EditForm Model="prestamo" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
 
-				@*Nombres*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Nombres</strong></label>
-					<InputText class="form-control" @bind-Value="estudiante.Nombres"></InputText>
-				</div>
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title mt-2">Modificar Préstamo</h5>
+            </div>
 
-				@*Direccion*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Direccion</strong></label>
-					<InputText class="form-control" @bind-Value="estudiante.Direccion"></InputText>
-				</div>
+            <div class="card-body">
+                @* PrestamosId *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Id</strong></label>
+                    <InputNumber class="form-control" @bind-Value="prestamo.PrestamosId" readonly />
+                </div>
 
-				@*Email*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Email</strong></label>
-					<InputText class="form-control" @bind-Value="estudiante.Email"></InputText>
-				</div>
+                @* EstudianteId *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Estudiante</strong></label>
+                    <InputSelect class="form-control form-select" @bind-Value="prestamo.EstudianteId">
+                        <option value="0">Elija una opción</option>
+                        @foreach (var estudiante in estudiantes)
+                        {
+                            <option value="@estudiante.EstudianteId">@estudiante.Nombres</option>
+                        }
+                    </InputSelect>
+                </div>
 
-				@*Fecha de Nacimiento*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Fecha de Nacimiento</strong></label>
-					<InputDate class="form-control" @bind-Value="estudiante.FechaNacimiento"></InputDate>
-				</div>
+                @* LibrosId *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Libro</strong></label>
+                    <InputSelect class="form-control form-select" @bind-Value="prestamo.LibrosId">
+                        <option value="0">Elija una opción</option>
+                        @foreach (var libro in libros)
+                        {
+                            <option value="@libro.LibroID">@libro.Titulo</option>
+                        }
+                    </InputSelect>
+                </div>
 
-				@*footer*@
-				<div class="card-footer text-center mt-2">
-					<a href="/EstudianteIndex" class="btn btn-secondary mt-2"><span class="bi bi-arrow-left"></span> Volver</a>
-					<button type="submit" class="btn btn-primary bi bi-floppy mt-2">Guardar</button>
-					<button type="button" class="btn btn-danger bi bi-trash mt-2" @onclick="Eliminar">Eliminar</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                @* Footer *@
+                <div class="card-footer text-center mt-2">
+                    <a href="/Prestamos/Index" class="btn btn-secondary mt-2">
+                        <span class="bi bi-arrow-left"></span> Volver
+                    </a>
+
+                    <button type="submit" class="btn btn-primary bi bi-floppy mt-2">
+                        Guardar
+                    </button>
+
+                    <button type="button" class="btn btn-danger bi bi-trash mt-2"
+                            data-bs-toggle="modal" data-bs-target="#modalEliminar">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </EditForm>
 
-<Modal @ref="modal" Title="Confirmar Eliminacion">
-	<BodyTemplate>
-		¿Estas seguro que deseas eliminar al estudiante "@estudiante.Nombres"?
-	</BodyTemplate>
+@* Modal de eliminación *@
+<div class="modal" id="modalEliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
 
-	<FooterTemplate>
-		<Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick"> No </Button>
-		<Button Color="ButtonColor.Danger" @onclick="MostrarModal"> Sí </Button>
-	</FooterTemplate>
-</Modal>
+            <div class="modal-body">
+                @if (prestamo != null)
+                {
+                    <p>¿Estás seguro de que deseas eliminar este préstamo?</p>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="Eliminar">
+                    Confirmar
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
-	[Parameter]
+    [Parameter]
+    public int PrestamosId { get; set; }
 
-	public int EstudianteId { get; set; }
+    private PrestamoLibros prestamo { get; set; } = new PrestamoLibros();
 
-	private Estudiantes estudiante { get; set; } = new Estudiantes();
+    private List<Estudiantes> estudiantes { get; set; } = new List<Estudiantes>();
+    private List<Libros> libros { get; set; } = new List<Libros>();
 
-	private Modal modal;
+    protected override async Task OnInitializedAsync()
+    {
+        var resultPrestamo = await prestamoS.Buscar(PrestamosId);
+        var resultEstudiantes = await estudianteS.GetList(e => true);
+        var resultLibros = await libroService.GetList(l => true);
 
-	protected override async Task OnInitializedAsync()
-	{
-		var estudianteEncontrado = await estudianteS.Buscar(EstudianteId);
+        resultPrestamo.OnSuccess(p => prestamo = p);
+        resultEstudiantes.OnSuccess(e => estudiantes = e);
+        resultLibros.OnSuccess(l => libros = l);
+    }
 
-		if (estudianteEncontrado != null)
-		{
-			estudiante = estudianteEncontrado;
-		}
-	}
+    private async Task Modificar()
+    {
+        var resultModificado = await prestamoS.Guardar(prestamo);
 
-	private async Task Modificar()
-	{
-		bool Modificado = await estudianteS.Guardar(estudiante);
+        resultModificado.OnSuccess(() =>
+        {
+            toastServices.ShowSuccess("Préstamo modificado correctamente.");
+            navigationManager.NavigateTo("/Prestamos/Index");
+        });
 
-		if (Modificado)
-		{
-			toastServices.ShowSuccess("Estudiante modificado correctamente.");
-			navigationManager.NavigateTo("/EstudianteIndex");
-		}
-		else
-		{
-			toastServices.ShowError("Error al modificar al estudiante");
-		}
-	}
+        resultModificado.OnFailure(() =>
+        {
+            toastServices.ShowError("Error al modificar el préstamo.");
+        });
+    }
 
-	private async Task MostrarModal()
-	{
-		await modal.ShowAsync();
-	}
+    private async Task Eliminar()
+    {
+        var resultEliminado = await prestamoS.Eliminar(PrestamosId);
 
-	private async Task OnHideModalClick()
-	{
-		await modal.HideAsync();
-	}
+        resultEliminado.OnSuccess(() =>
+        {
+            toastServices.ShowSuccess("Préstamo eliminado correctamente.");
+            navigationManager.NavigateTo("/Prestamos/Index");
+        });
 
-	private async Task Eliminar()
-	{
-		bool Eliminado = await estudianteS.Eliminar(estudiante.EstudianteId);
-
-		if (Eliminado)
-		{
-			toastServices.ShowSuccess("Estudiante eliminado correctamente.");
-			await modal.HideAsync();
-			navigationManager.NavigateTo("/EstudianteIndex");
-		}
-		else
-		{
-			toastServices.ShowError("Error al eliminar el estudiante");
-		}
-	}
+        resultEliminado.OnFailure(() =>
+        {
+            toastServices.ShowError("Error al eliminar el préstamo.");
+        });
+    }
 }
-

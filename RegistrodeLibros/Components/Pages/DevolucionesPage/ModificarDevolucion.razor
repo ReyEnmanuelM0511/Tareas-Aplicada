@@ -1,0 +1,124 @@
+﻿@page "/Devoluciones/Modificar/{DevolucionId:int}"
+@rendermode InteractiveServer
+
+
+<PageTitle>Modificar Devoluci&oacute;n</PageTitle>
+<EditForm Model="Devoluciones" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title mt-2">Editar Devoluci&oacute;n</h5>
+            </div>
+
+            <div class="card-body">
+                @*Devolucion*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Id</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Devoluciones.DevolucionId" readonly></InputNumber>
+                </div>
+
+                @*Fecha*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="Devoluciones.Fecha"></InputDate>
+                    <ValidationMessage For="(() => Devoluciones.Fecha)" />
+                </div>
+
+                @*Prestamo*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Pr&eacute;stamo</strong></label>
+                    <InputSelect class="form-control form-select" @bind-Value="Devoluciones.PrestamoId">
+                        <option value="" selected disabled>  Elija una opci&oacute;n  </option>
+                        @foreach (var Prestamo in prestamos)
+                        {
+                            <option value="@prestamo.PrestamosId">Estudiante: @prestamo.estudiante.Nombres - Libro: @prestamo.libros.Titulo</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Devoluciones.PrestamoId)" />
+                </div>
+            </div>
+
+            @* footer *@
+            <div class="card-footer text-center mt-2">
+                <a href="/Devoluciones/Index" class="btn btn-secondary mt-2"> <span class="bi bi-arrow-left"></span> Volver</a>
+                <button type="submit" class="btn btn-primary bi bi-floppy mt-2"> Guardar</button>
+                <button type="button" class="btn btn-danger bi bi-trash mt-2" data-bs-toggle="modal" data-bs-target="#modalEliminar"> Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@*Modal eliminacion*@
+<div class="modal" id="modalEliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"> Confirmar Eliminaci&oacute;n</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                @if (Devoluciones != null)
+                {
+
+                    <p>¿Esta seguro que desea eliminar esta devoluci&oacute;n</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="Eliminar">Confirmar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int DevolucionId { get; set; }
+    private  Devoluciones Devoluciones { get; set; } = new Devoluciones();
+    private PrestamoLibros prestamo { get; set; }
+
+    public List<PrestamoLibros> prestamos { get; set; } = new List<PrestamoLibros>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resultDevolucion = await devolucionesService.Buscar(DevolucionId);
+        var resultPrestamos = await prestamoS.GetList(p => true);
+
+        resultDevolucion.OnSuccess(d => Devoluciones = d);
+        resultPrestamos.OnSuccess(p => prestamos = p);
+    }
+
+    private async Task Modificar()
+    {
+        var resultModificado = await devolucionesService.Guardar(Devoluciones);
+
+        resultModificado.OnSuccess(() =>
+        {
+            toastServices.ShowSuccess("Devolucion modificada correctamente.");
+            navigationManager.NavigateTo("/Devoluciones/Index");
+        });
+        resultModificado.OnSuccess(() =>
+        {
+            toastServices.ShowError("Error al modificar la Devolucion.");
+        });
+    }
+
+    private async Task Eliminar()
+    {
+
+        var resultEliminado = await devolucionesService.Eliminar(DevolucionId);
+
+        resultEliminado.OnSuccess(() =>
+        {
+            toastServices.ShowSuccess("Devolucion eliminada correctamente.");
+            navigationManager.NavigateTo("/Devoluciones/Index");
+        });
+        resultEliminado.OnFailure(() =>
+        {
+            toastServices.ShowError("Error al eliminar la devolucion.");
+        });
+    }
+}

@@ -1,87 +1,89 @@
 ﻿@page "/crearEstudiante"
 @rendermode InteractiveServer
 
+@*HTML*@
 <PageTitle>Agregar Estudiante</PageTitle>
 
 <EditForm Model="estudiante" OnValidSubmit="Guardar">
-	<DataAnnotationsValidator/>
+    <DataAnnotationsValidator />
 
-	<div class="container">
-		<div class="card shadow-lg">
-			<div class="card-header text-center">
-				<h5 class="card-title mt-2">Agregar Estudiante</h5>
-			</div>
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title mt-2">Agregar Estudiante</h5>
+            </div>
 
-			<div class="card-body">
-				@*EstudianteId*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Id</strong></label>
-					<InputNumber class="form-control" @bind-Value="estudiante.EstudianteId"></InputNumber>
-				</div>
+            <div class="card-body">
+                @*EstudianteId*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Id</strong></label>
+                    <InputNumber class="form-control" @bind-Value="estudiante.EstudianteId" readonly></InputNumber>
+                </div>
 
-				@*Nombres*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Nombre Completo</strong></label>
-					<InputText class="form-control" @bind-Value="estudiante.Nombres"></InputText>
-					<ValidationMessage For="() => estudiante.Nombres"></ValidationMessage>
-				</div>
+                @*Nombres*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Nombre Completo</strong></label>
+                    <InputText class="form-control" @bind-Value="estudiante.Nombres"></InputText>
+                    <ValidationMessage For="(() => estudiante.Nombres)" />
+                </div>
 
-				@*Direccion*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Dirección</strong></label>
-					<InputText class="form-control" @bind-Value="estudiante.Direccion"></InputText>
-					<ValidationMessage For="() => estudiante.Direccion"></ValidationMessage>
-				</div>
+                @*Direccion*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Dirección</strong></label>
+                    <InputText class="form-control" @bind-Value="estudiante.Direccion"></InputText>
+                    <ValidationMessage For="(() => estudiante.Direccion)" />
+                </div>
 
-				@*Email*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Email</strong></label>
-					<InputText class="form-control" @bind-Value="estudiante.Email"></InputText>
-					<ValidationMessage For="() => estudiante.Email"></ValidationMessage>
-				</div>
+                @*Email*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Email</strong></label>
+                    <InputText class="form-control" typeof="email" @bind-Value="estudiante.Email"></InputText>
+                    <ValidationMessage For="(() => estudiante.Email)" />
+                </div>
 
-				@*Fecha de Nacimiento*@
-				<div class="mb-3">
-					<label class="form-label"><strong>Fecha de Nacimiento</strong></label>
-					<InputDate class="form-control" @bind-Value="estudiante.FechaNacimiento"></InputDate>
-					<ValidationMessage For="() => estudiante.FechaNacimiento"></ValidationMessage>
-				</div>
-			</div>
+                @*Fecha de Nacimiento*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha de Nacimiento</strong></label>
+                    <InputDate class="form-control" @bind-Value="estudiante.FechaNacimiento"></InputDate>
+                    <ValidationMessage For="(() => estudiante.FechaNacimiento)" />
+                </div>
+            </div>
 
-			@*footer*@
-			<div class="card-footer text-center mt-2">
-				<a href="/EstudianteIndex" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
-				<button type="submit" class="btn btn-primary bi bi-floppy">Guardar</button>
-			</div>
-
-		</div>
-	</div>
-
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+                <a href="/EstudianteIndex" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
+            </div>
+        </div>
+    </div>
 </EditForm>
+
 @Mensaje
 
-@code{
-		private Estudiantes estudiante = new Estudiantes();
-	public string Mensaje { get; set; } = string.Empty;
+@code {
+    private Estudiantes estudiante = new Estudiantes();
+    public string Mensaje { get; set; } = string.Empty;
 
-	private async Task Guardar()
-	{
-		bool creado = await estudianteS.Guardar(estudiante);
+    private async Task Guardar()
+    {
+        var crearResult = await estudianteS.Guardar(estudiante);
 
-		if (creado)
-		{
-			toastServices.ShowSuccess("El estudiante ha sido agregado correctamente");
-			navigationManager.NavigateTo("/EstudianteIndex");
-		} 
-		else if (estudianteS.Buscar(estudiante.EstudianteId) != null)
-		{
-			toastServices.ShowError("El estudiante ya existe en el registro");
-		}
-		else
-		{
-			toastServices.ShowError("Error al agregar al estudiante");
-		}
-	}
+        crearResult.OnSuccess(() =>
+        {
+            toastServices.ShowSuccess("El estudiante ha sido agregado correctamente");
+            navigationManager.NavigateTo("/EstudianteIndex");
+        });
+
+        crearResult.OnFailure(() =>
+        {
+            if (estudianteS.Buscar(estudiante.EstudianteId) != null)
+            {
+                toastServices.ShowError("El estudiante ya existe en el registro");
+            }
+
+            toastServices.ShowError("Error al agregar al estudiante");
+        });
+    }
 }
-
-
