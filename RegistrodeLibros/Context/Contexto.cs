@@ -7,7 +7,7 @@ public class Contexto : DbContext
     public DbSet<Libros> Libros {get; set;}
     public DbSet<Estudiantes> Estudiantes {get; set; }
     public DbSet<PrestamoLibros> Prestamos { get; set; }
-    public DbSet<EntradaLibros> EntradaLibro { get; set; }
+    public DbSet<EntradaLibros> EntradaLibros { get; set; }
     public DbSet<EntradaLibrosDetalle> EntradaLibrosDetalle { get; set; }
 
 }
