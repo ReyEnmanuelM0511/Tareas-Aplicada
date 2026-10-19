@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace RegistrodeLibros.Models;
 
 public class EntradaLibros
@@ -14,6 +15,9 @@ public class EntradaLibros
 
     [Range(1, int.MaxValue, ErrorMessage = "Debe introducir una cantidad valida")]
     public int Total { get; set; }
+
+    [InverseProperty("EntradaLibro")]
+    public virtual ICollection<EntradaLibrosDetalle> EntradaLibrosDetalle { get; set; } = new List<EntradaLibrosDetalle>();
 
 }
 

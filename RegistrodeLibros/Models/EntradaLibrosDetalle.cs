@@ -21,5 +21,6 @@ public class EntradaLibrosDetalle
     public virtual Libros Libro { get; set; } = null!;
 
     [ForeignKey("EntradaId")]
+    [InverseProperty("EntradaLibrosDetalle")]
     public virtual EntradaLibros EntradaLibro { get; set; } = null!;
 }
