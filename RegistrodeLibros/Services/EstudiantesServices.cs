@@ -1,64 +1,74 @@
-﻿namespace RegistrodeLibros.Services;
-
-using Aplicada1.Core;
-using Context;
+﻿using Aplicada1.Core;
+using RegistrodeLibros.Context;
 using Microsoft.EntityFrameworkCore;
 using RegistrodeLibros.Models;
 using System.Linq.Expressions;
 
-public class EstudiantesServices(IDbContextFactory<Contexto> contextFactory) : IService<Estudiantes, int>
-{
+namespace RegistrodeLibros.Services;
 
-    public async Task<bool> Guardar(Estudiantes estudiante)
+public class EstudiantesServices(IDbContextFactory<Contexto> contextFactory) : IServiceResult<Estudiantes, int>
+{
+    public async Task<Result> Guardar(Estudiantes estudiante)
     {
         if (!await Existe(estudiante.EstudianteId))
         {
-            return await Insertar(estudiante);
+            if (await ExisteNombre(estudiante.Nombres))
+            {
+                return Result.Failure(new Error("Nombre Duplicado","Ya existe un estudiante con ese nombre"));
+            }
+
+            var inserto = await Insertar(estudiante);
+            return Result.Success(inserto);
         }
         else
         {
-            return await Modificar(estudiante);
+            var modifico = await Modificar(estudiante);
+            return Result.Success(modifico);
         }
     }
 
-    public async Task<bool> Insertar(Estudiantes estudiante)
-    {
-        await using var _context = await contextFactory.CreateDbContextAsync();
-        _context.Estudiantes.Add(estudiante);
-        return await _context.SaveChangesAsync() > 0;
-    }
-
-    public async Task<bool> Modificar(Estudiantes estudiante)
-    {
-        await using var _context = await contextFactory.CreateDbContextAsync();
-        _context.Update(estudiante);
-        return await _context.SaveChangesAsync() > 0;
-    }
-
-
-    public async Task<Estudiantes> Buscar(int id)
-    {
-        await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.Estudiantes.FirstOrDefaultAsync(e => e.EstudianteId == id);
-    }
-
-    public async Task<bool> Eliminar(int id)
-    {
-
-        await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.Estudiantes.Where(e => e.EstudianteId == id).ExecuteDeleteAsync() > 0;
-    }
-
-    public async Task<List<Estudiantes>> GetList(Expression<Func<Estudiantes, bool>> criterio)
-    {
-        await using var _context = await contextFactory.CreateDbContextAsync();
-        return await _context.Estudiantes.Where(criterio).AsNoTracking().ToListAsync();
-    }
-
-    private async Task<bool> Existe(int? id)
+    private async Task<bool> Existe(int? estudianteId)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Estudiantes
-            .AnyAsync(e => e.EstudianteId == id);
+        return await contexto.Estudiantes.AnyAsync(e => e.EstudianteId == estudianteId);
+    }
+
+    private async Task<bool> ExisteNombre(string nombre)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Estudiantes.AnyAsync(e => e.Nombres == nombre);
+    }
+
+    private async Task<bool> Insertar(Estudiantes estudiante)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        contexto.Estudiantes.Add(estudiante);
+        return await contexto.SaveChangesAsync() > 0;
+    }
+
+    private async Task<bool> Modificar(Estudiantes estudiante)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        contexto.Update(estudiante);
+        return await contexto.SaveChangesAsync() > 0;
+    }
+
+    public async Task<Result<Estudiantes?>> Buscar(int estudianteId)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Estudiantes.FirstOrDefaultAsync(e => e.EstudianteId == estudianteId);
+    }
+
+    public async Task<Result<List<Estudiantes>>> GetList(Expression<Func<Estudiantes, bool>> criterio)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        return await contexto.Estudiantes.Where(criterio).AsNoTracking().ToListAsync();
+    }
+
+    public async Task<Result> Eliminar(int estudianteId)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var eliminado = await contexto.Estudiantes.Where(e => e.EstudianteId == estudianteId).ExecuteDeleteAsync() > 0;
+        return Result.Success(eliminado);
     }
 }
