@@ -1,203 +1,129 @@
 @page "/modificarLibro/{Id:int}"
-
-@using Models
-@using Services
-
-@inject LibrosServices librosService
-@inject NavigationManager Navigation
-
 @rendermode InteractiveServer
 
-<PageTitle>Modificar Libro</PageTitle>
+<PageTitle>Editar Libro</PageTitle>
 
+<EditForm Model="libro" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
 
-<div class="p-4 border rounded">
+    <div class="container">
+        <div class="card shadow-lg">
 
-    <h3 class="mb-4">
-        Modificar Libro
-    </h3>
-
-
-    @if (libro == null)
-    {
-        <div class="alert alert-warning">
-            Libro no encontrado.
-        </div>
-
-        <a href="/LibrosIndex"
-           class="btn btn-secondary">
-
-            Volver
-
-        </a>
-    }
-    else
-    {
-
-        <!-- LIBRO ID -->
-        <div class="mb-3">
-
-            <label class="form-label">
-                LibroID
-            </label>
-
-            <input type="number"
-                   class="form-control"
-                   value="@libro.LibroID"
-                   disabled />
-
-        </div>
-
-
-        <!-- TITULO -->
-        <div class="mb-3">
-
-            <label class="form-label">
-                Título
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   @bind="libro.Titulo"
-                   placeholder="Ingrese el título" />
-
-        </div>
-
-
-        <!-- AUTOR -->
-        <div class="mb-3">
-
-            <label class="form-label">
-                Autor
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   @bind="libro.Autor"
-                   placeholder="Ingrese el autor" />
-
-        </div>
-
-
-        <!-- AÑO -->
-        <div class="mb-3">
-
-            <label class="form-label">
-                Año de Publicación
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   @bind="libro.AnoPublicacion"
-                   placeholder="Ejemplo: 2026" />
-
-        </div>
-
-
-        <!-- BOTONES -->
-        <div class="d-flex justify-content-center gap-3 mt-4">
-
-            <a href="/LibrosIndex"
-               class="btn btn-secondary">
-
-                Volver
-
-            </a>
-
-
-            <button type="button"
-                    class="btn btn-primary"
-                    @onclick="GuardarCambios">
-
-                Guardar Cambios
-
-            </button>
-
-        </div>
-
-
-        @if (!string.IsNullOrEmpty(mensaje))
-        {
-            <div class="alert @claseMensaje mt-4">
-                @mensaje
+            <div class="card-header text-center">
+                <h5 class="card-title mt-2">Editar Libro</h5>
             </div>
-        }
 
-    }
+            <div class="card-body">
+                @* LibroID *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>LibroID</strong></label>
+                    <InputNumber class="form-control" @bind-Value="libro.LibroID" readonly></InputNumber>
+                </div>
 
+                @* Titulo *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Título</strong></label>
+                    <InputText class="form-control" @bind-Value="libro.Titulo"></InputText>
+                </div>
+
+                @* Autor *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Autor</strong></label>
+                    <InputText class="form-control" @bind-Value="libro.Autor"></InputText>
+                </div>
+
+                @* Año de Publicacion *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Año de Publicación</strong></label>
+                    <InputNumber class="form-control" @bind-Value="libro.AnoPublicacion"></InputNumber>
+                </div>
+
+                @*Disponibilidad*@
+                @* Año de Publicacion *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Disponibilidad</strong></label>
+                    <InputSelect class="form-control" @bind-Value="libro.Disponible"></InputSelect>
+                </div>
+            </div>
+
+            @* footer *@
+            <div class="card-footer text-center mt-2">
+                <a href="/LibrosIndex"class="btn btn-secondary mt-2"><span class="bi bi-arrow-left"></span>Volver</a>
+                <button type="submit" class="btn btn-primary bi bi-floppy mt-2">Guardar</button>
+                <button type="button" class="btn btn-danger bi bi-trash mt-2" data-bs-toggle="modal" data-bs-target="#modalEliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@* Modal eliminacion *@
+<div class="modal" id="modalEliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">               
+                    <p>¿Está seguro que desea eliminar este libro?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="Eliminar">Confirmar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
-
 
 @code {
 
     [Parameter]
     public int Id { get; set; }
 
+    private Libros libro = new Libros();
 
-    private Libros? libro;
-
-    private string mensaje = string.Empty;
-
-    private string claseMensaje = "alert-success";
-    
-
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        libro = await librosService.Buscar(Id);
+        var result = await libroService.Buscar(Id);
+        result.OnSuccess(l => libro = l);
     }
 
-
-    private async Task GuardarCambios()
+    private async Task Modificar()
     {
-        if (libro == null)
+        var resultModificado = await libroService.Guardar(libro);
+
+        resultModificado.OnSuccess(() =>
         {
-            return;
-        }
+            toastServices.ShowSuccess(
+                "Libro modificado correctamente.");
 
+            navigationManager.NavigateTo("/LibrosIndex");
+        });
 
-        if (string.IsNullOrWhiteSpace(libro.Titulo))
+        resultModificado.OnFailure(() =>
         {
-            mensaje = "Debe ingresar el título del libro.";
-
-            claseMensaje = "alert-danger";
-
-            return;
-        }
-
-
-        if (string.IsNullOrWhiteSpace(libro.Autor))
-        {
-            mensaje = "Debe ingresar el autor.";
-
-            claseMensaje = "alert-danger";
-
-            return;
-        }
-
-
-        if (libro.AnoPublicacion == 0)
-        {
-            mensaje = "Debe ingresar el año de publicación.";
-
-            claseMensaje = "alert-danger";
-
-            return;
-        }
-
-
-        bool resultado = await librosService.Modificar(libro);
-
-
-        if (resultado)
-        {
-            Navigation.NavigateTo("/LibrosIndex");
-        }
-        else
-        {
-            mensaje = "No se pudieron guardar los cambios.";
-
-            claseMensaje = "alert-danger";
-        }
+            toastServices.ShowError(
+                "Error al modificar el libro.");
+        });
     }
 
+    private async Task Eliminar()
+    {
+        var resultEliminado =
+            await libroService.Eliminar(libro.LibroID);
+
+        resultEliminado.OnSuccess(() =>
+        {
+            toastServices.ShowSuccess(
+                "Libro eliminado correctamente.");
+
+            navigationManager.NavigateTo("/LibrosIndex");
+        });
+
+        resultEliminado.OnFailure(() =>
+        {
+            toastServices.ShowError(
+                "Error al eliminar el libro.");
+        });
+    }
 }
