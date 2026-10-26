@@ -1,24 +1,40 @@
 ﻿@page
 @{
-	ViewData["Title"] = "SignalR Chat";
+    ViewData["Title"] = "Seguimiento de Pedidos en Vivo";
 }
 
-<h1>Chat en tiempo real</h1>
+<h1>Seguimiento de Pedidos en Tiempo Real</h1>
 
+<!-- Campo para el ID del Pedido -->
 <div>
-	<label for="userInput">Usuario</label>
-	<input id="userInput" maxlength="40" />
+    <label for="orderIdInput">ID del Pedido</label>
+    <input id="orderIdInput" type="number" placeholder="Ej. 101" />
 </div>
 
+<!-- Campo para el Nombre del Cliente -->
 <div>
-	<label for="messageInput">Message</label>
-	<input id="messageInput" maxlength="1000" />
+    <label for="clientInput">Cliente</label>
+    <input id="clientInput" maxlength="40" placeholder="Nombre del cliente" />
 </div>
 
-<button id="sendButton" disabled>Enviar</button>
+<!-- Selector de Estados del Pedido (con valores numéricos del enum) -->
+<div>
+    <label for="statusSelect">Estado del Pedido</label>
+    <select id="statusSelect">
+        <option value="0">Pendiente</option>
+        <option value="1">En Preparación</option>
+        <option value="2">Enviado</option>
+        <option value="3">Entregado</option>
+    </select>
+</div>
+
+<!-- Botón de acción y estado de conexión -->
+<button id="updateButton" disabled>Actualizar Estado</button>
 <p id="status">Conectando...</p>
 
-<ul id="messagesList"></ul>
+<!-- Lista donde se mostrarán los cambios en vivo sin recargar la página -->
+<ul id="ordersList"></ul>
 
+<!-- Scripts de SignalR y la lógica de pedidos -->
 <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
-<script src="~/js/chat.js"></script>
+<script src="~/js/pedidos.js"></script>
