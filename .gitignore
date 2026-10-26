@@ -7,3 +7,10 @@
 /RegistrodeLibros/Migrations
 /PracticaParcial/.vs
 /RegistrodeLibros/Properties/PublishProfiles
+/SignalRArchitecture/.vs
+/SignalRArchitecture/SignalR.Client/bin/Debug/net10.0
+/SignalRArchitecture/SignalR.Client/obj
+/SignalRArchitecture/SignalR.Hub/bin/Debug/net10.0
+/SignalRArchitecture/SignalR.Hub/obj
+/SignalRArchitecture/SignalR.Shared/bin/Debug/net10.0
+/SignalRArchitecture/SignalR.Shared/obj
