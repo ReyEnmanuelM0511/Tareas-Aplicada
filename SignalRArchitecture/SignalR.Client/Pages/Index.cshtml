@@ -17,7 +17,7 @@
     <input id="clientInput" maxlength="40" placeholder="Nombre del cliente" />
 </div>
 
-<!-- Selector de Estados del Pedido (con valores numéricos del enum) -->
+<!-- Selector de Estados del Pedido -->
 <div>
     <label for="statusSelect">Estado del Pedido</label>
     <select id="statusSelect">
@@ -28,13 +28,11 @@
     </select>
 </div>
 
-<!-- Botón de acción y estado de conexión -->
 <button id="updateButton" disabled>Actualizar Estado</button>
 <p id="status">Conectando...</p>
 
-<!-- Lista donde se mostrarán los cambios en vivo sin recargar la página -->
 <ul id="ordersList"></ul>
 
-<!-- Scripts de SignalR y la lógica de pedidos -->
+
 <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
 <script src="~/js/pedidos.js"></script>

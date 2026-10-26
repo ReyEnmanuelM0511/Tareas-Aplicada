@@ -11,8 +11,6 @@ const ordersList = document.getElementById("ordersList");
 
 connection.on("ReceiveOrderUpdate", (order) => {
     const item = document.createElement("li");
-
-    // Corregido: 'actualizado' (tal como viene del record C#)
     const fechaHora = order.actualizado ? new Date(order.actualizado) : new Date();
     const hora = fechaHora.toLocaleTimeString("es-DO", {
         hour: "2-digit",
@@ -20,7 +18,6 @@ connection.on("ReceiveOrderUpdate", (order) => {
         second: "2-digit"
     });
 
-    // Mapeo del número de enum que devuelve el servidor a texto legible para la interfaz
     const textosEstados = ["Pendiente", "En Preparación", "Enviado", "Entregado"];
     const estadoTexto = textosEstados[order.estado] ?? "Desconocido";
 
@@ -65,7 +62,6 @@ updateButton.addEventListener("click", async () => {
     }
 
     try {
-        // Invocamos enviando el estado como número entero (0, 1, 2, 3)
         await connection.invoke("UpdateOrderStatus", parseInt(orderId, 10), cliente, parseInt(estadoSelect, 10));
 
         document.getElementById("orderIdInput").value = "";
