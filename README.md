@@ -27,7 +27,7 @@ Abrir una terminal exclusiva para el servidor.
 Ejecutar el comando para iniciar el proyecto apuntando explícitamente al puerto asignado (7001):
     PowerShell
 
-dotnet run --project SignalR.Hub --urls https://localhost:7001
+    dotnet run --project SignalR.Hub --urls https://localhost:7001
 
 Verificar en la consola que el servidor indique que está escuchando en las URLs configuradas.
 
