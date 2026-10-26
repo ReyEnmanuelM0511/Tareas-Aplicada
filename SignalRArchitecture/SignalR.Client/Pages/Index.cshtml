@@ -1,0 +1,38 @@
+﻿@page
+@{
+    ViewData["Title"] = "Seguimiento de Pedidos en Vivo";
+}
+
+<h1>Seguimiento de Pedidos en Tiempo Real</h1>
+
+<!-- Campo para el ID del Pedido -->
+<div>
+    <label for="orderIdInput">ID del Pedido</label>
+    <input id="orderIdInput" type="number" placeholder="Ej. 101" />
+</div>
+
+<!-- Campo para el Nombre del Cliente -->
+<div>
+    <label for="clientInput">Cliente</label>
+    <input id="clientInput" maxlength="40" placeholder="Nombre del cliente" />
+</div>
+
+<!-- Selector de Estados del Pedido -->
+<div>
+    <label for="statusSelect">Estado del Pedido</label>
+    <select id="statusSelect">
+        <option value="0">Pendiente</option>
+        <option value="1">En Preparación</option>
+        <option value="2">Enviado</option>
+        <option value="3">Entregado</option>
+    </select>
+</div>
+
+<button id="updateButton" disabled>Actualizar Estado</button>
+<p id="status">Conectando...</p>
+
+<ul id="ordersList"></ul>
+
+
+<script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/js/pedidos.js"></script>
