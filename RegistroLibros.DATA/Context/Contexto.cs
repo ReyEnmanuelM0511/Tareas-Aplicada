@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RegistroLibros.DATA.Models;
 using System;
 using System.Collections.Generic;
 
-namespace RegistroLibro.DATA.Context;
+namespace RegistroLibros.DATA.Context;
 
 public partial class Contexto : DbContext
 {

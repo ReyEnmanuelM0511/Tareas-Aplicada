@@ -1,21 +1,24 @@
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RegistroLibros.DATA.Models;
 
-public partial class Libros
+public class Libros
 {
-    public int LibroId { get; set; }
+    [Key]
+    public int LibroID { get; set;}
 
-    public string Titulo { get; set; } = null!;
+    [Required(ErrorMessage = "El campo de Titulo es Obligatorio")]
+    public string? Titulo { get; set; } = null!;
 
-    public string Autor { get; set; } = null!;
+    [Required(ErrorMessage = "El campo de Autor es Requerido")]
+    public string? Autor { get; set; } = null!;
 
-    public int AnoPublicacion { get; set; }
+    [Required(ErrorMessage ="El campo de AnoPublicacion es obligatorio")]
+    public int AnoPublicacion {get; set;}
 
-    public int CantidadPrestamos { get; set; }
+    public bool Disponible { get; set; } = true;
 
-    public int CantidadDisponible { get; set; }
+    public int CantidadLibros { get; set; }
 
     public virtual ICollection<EntradaLibrosDetalle> EntradasDetalles { get; set; } = new List<EntradaLibrosDetalle>();
 
