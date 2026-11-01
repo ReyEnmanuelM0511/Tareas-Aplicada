@@ -14,3 +14,8 @@
 /SignalRArchitecture/SignalR.Hub/obj
 /SignalRArchitecture/SignalR.Shared/bin/Debug/net10.0
 /SignalRArchitecture/SignalR.Shared/obj
+/RegistroLibro.Service/obj/Debug/net10.0
+*.json
+/RegistroLibro.Service/obj/project.nuget.cache
+/RegistroLibro.Service/obj/RegistroLibro.Service.csproj.nuget.g.props
+/RegistroLibro.Service/obj/RegistroLibro.Service.csproj.nuget.g.targets
