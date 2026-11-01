@@ -1,5 +1,6 @@
 @page "/crearLibro"
 @rendermode InteractiveServer
+@inject ToastService toastService
 
 
 <PageTitle>Crear Libro</PageTitle>
@@ -86,13 +87,13 @@
 
         crearResult.OnSuccess(() =>
         {
-            toastServices.ShowSuccess("Libro guardado correctamente");
+            toastService.ShowSuccess("Libro guardado correctamente");
             navigationManager.NavigateTo("/LibrosIndex");
         });
 
         crearResult.OnFailure(() =>
         {
-            toastServices.ShowError("No se pudo guardar correctamente");
+            toastService.ShowError("No se pudo guardar correctamente");
         });
     }
 }
