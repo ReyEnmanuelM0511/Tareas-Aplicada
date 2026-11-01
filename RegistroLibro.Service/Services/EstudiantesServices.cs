@@ -27,7 +27,7 @@ public class EstudiantesServices(IDbContextFactory<Contexto> contextFactory) : I
         }
     }
 
-    private async Task<bool> Existe(int? estudianteId)
+    public async Task<bool> Existe(int? estudianteId)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Estudiantes.AnyAsync(e => e.EstudianteId == estudianteId);
