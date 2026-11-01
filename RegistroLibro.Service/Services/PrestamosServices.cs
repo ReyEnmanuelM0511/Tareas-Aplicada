@@ -1,10 +1,10 @@
 ﻿using Aplicada1.Core;
-using RegistrodeLibros.Models;
-using RegistrodeLibros.Context;
+using RegistroLibros.DATA.Models;
+using RegistroLibros.DATA.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace RegistrodeLibros.Services;
+namespace RegistroLibro.Services;
 
 public class PrestamosServices(IDbContextFactory<Contexto> contextFactory) : IServiceResult<PrestamoLibros, int>
 {
