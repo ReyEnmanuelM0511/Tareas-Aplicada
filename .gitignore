@@ -21,3 +21,4 @@
 /RegistroLibro.Service/obj/RegistroLibro.Service.csproj.nuget.g.targets
 /RegistroLibro.DATA
 /RegistroLibros.API/obj
+/RegistroLibros.API/bin/Debug
