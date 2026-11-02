@@ -1,36 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RegistroLibros.DATA.Models;
 using RegistroLibro.Service.Services;
+using RegistroLibros.DATA.Models;
 
-namespace RegistroLibros.API.Controllers;
+namespace RegistroLibros.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-
-public class EstudianteController : ControllerBase
+public class EstudiantesController : ControllerBase
 {
-    private readonly EstudiantesServices estudianteServices;
+    private readonly EstudiantesServices estudianteService;
 
-    public EstudianteController(EstudiantesServices estudianteService)
+    public EstudiantesController(EstudiantesServices estudianteService)
     {
-        estudianteServices = estudianteService;
+        this.estudianteService = estudianteService;
     }
 
-    //GET: api/estudiantes
+    // GET: api/estudiantes
     [HttpGet]
-    public async Task <ActionResult<IEnumerable<Estudiantes>>> GetEstudaintes()
+    public async Task<ActionResult<IEnumerable<Estudiantes>>> GetEstudiantes()
     {
-        var result = await estudianteServices.GetList(e => true);
+        var result = await estudianteService.GetList(e => true);
         return Ok(result.Value);
     }
 
-    //GET: api/estudiantes/5
+    // GET: api/estudiantes/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Estudiantes>> GetEstudiante(int id)
     {
-        var result = await estudianteServices.Buscar(id);
-        
-        if(!result.IsSuccess || result.Value == null)
+        var result = await estudianteService.Buscar(id);
+
+        if (!result.IsSuccess || result.Value == null)
         {
             return NotFound();
         }
@@ -38,7 +37,7 @@ public class EstudianteController : ControllerBase
         return Ok(result.Value);
     }
 
-    //GET: api/estudiantes
+    // POST: api/estudiantes
     [HttpPost]
     public async Task<ActionResult<Estudiantes>> PostEstudiante(Estudiantes estudiante)
     {
@@ -47,22 +46,22 @@ public class EstudianteController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await estudianteServices.Guardar(estudiante);
+        var result = await estudianteService.Guardar(estudiante);
         if (!result.IsSuccess)
         {
-            return BadRequest("No se pudo guardar el estudiante");
+            return BadRequest("No se pudo guardar el estudiante.");
         }
 
         return CreatedAtAction(nameof(GetEstudiante), new { id = estudiante.EstudianteId }, estudiante);
     }
 
-    //PUT: api/estudiantes/5
+    // PUT: api/estudiantes/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutEstudiante(int id, Estudiantes estudiante)
     {
-        if(id != estudiante.EstudianteId)
+        if (id != estudiante.EstudianteId)
         {
-            return BadRequest("El Id de la ruta no coincide con el Id del estudiante");
+            return BadRequest("El ID de la ruta no coincide con el ID del estudiante.");
         }
 
         if (!ModelState.IsValid)
@@ -70,15 +69,15 @@ public class EstudianteController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        if(!await estudianteServices.Existe(id))
+        if (!await estudianteService.Existe(id))
         {
             return NotFound();
         }
 
-        var result = await estudianteServices.Guardar(estudiante);
+        var result = await estudianteService.Guardar(estudiante);
         if (!result.IsSuccess)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, "Error al actualizar el estudiante");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Error al actualizar el estudiante.");
         }
 
         return NoContent();
@@ -88,12 +87,12 @@ public class EstudianteController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteEstudiante(int id)
     {
-        if (!await estudianteServices.Existe(id))
+        if (!await estudianteService.Existe(id))
         {
             return NotFound();
         }
 
-        var result = await estudianteServices.Eliminar(id);
+        var result = await estudianteService.Eliminar(id);
         if (!result.IsSuccess)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo eliminar el estudiante.");
@@ -102,5 +101,3 @@ public class EstudianteController : ControllerBase
         return NoContent();
     }
 }
-
-
