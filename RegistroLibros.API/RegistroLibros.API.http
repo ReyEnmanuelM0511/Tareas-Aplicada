@@ -1,0 +1,11 @@
+@RegistroLibros.API_HostAddress = http://localhost:5128
+
+GET {{RegistroLibros.Api_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+###
+
+GET {{RegistroLibros.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

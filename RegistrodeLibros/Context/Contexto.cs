@@ -1,6 +1,7 @@
-namespace RegistrodeLibros.Context;
 using Microsoft.EntityFrameworkCore;
 using RegistrodeLibros.Models;
+
+namespace RegistrodeLibros.Context;
 
 public class Contexto : DbContext
 {   
